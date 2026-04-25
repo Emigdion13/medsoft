@@ -397,4 +397,3 @@ MIT License
 
 ---
 
-**Nota**: Este es un sistema de demostración para fines educativos y no cumple con requisitos de cumplimiento HIPAA. No debe usarse para almacenar datos médicos reales en producción.
