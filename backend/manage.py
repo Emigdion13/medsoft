@@ -3,6 +3,13 @@
 import os
 import sys
 
+# Fix Django 5.1 bug: Constraint.max_name_length is missing
+from django.db.models.constraints import BaseConstraint, UniqueConstraint
+from django.db.models import Index
+if not hasattr(BaseConstraint, 'max_name_length'):
+    BaseConstraint.max_name_length = 63
+if not hasattr(Index, 'max_name_length'):
+    Index.max_name_length = 63
 
 def main():
     """Run administrative tasks."""

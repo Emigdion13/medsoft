@@ -118,7 +118,7 @@ class LabOrder(models.Model):
                 fields=['status'], name='lab_order_status_idx'
             ),
             models.Index(
-                fields=['-ordered_at'], name='lab_order_ordered_at_idx'
+                fields=['ordered_at'], name='lab_order_ordered_at_idx'
             ),
         ]
 
@@ -211,7 +211,7 @@ class LabResult(models.Model):
                 fields=['lab_order_item'], name='lab_result_item_idx'
             ),
             models.Index(
-                fields=['-processed_at'], name='lab_result_processed_idx'
+                fields=['processed_at'], name='lab_result_processed_idx'
             ),
             models.Index(
                 fields=['result_flag'], name='lab_result_flag_idx'

@@ -5,10 +5,15 @@ class UserRole(models.Model):
     """Relación usuarios-roles."""
 
     user = models.ForeignKey(
-        'core_users.User', on_delete=models.CASCADE, db_column='user_id'
+        'core_users.User',
+        on_delete=models.CASCADE,
+        db_column='user_id',
+        related_name='role_assignments',
     )
     role = models.ForeignKey(
-        'core_roles.Role', on_delete=models.CASCADE, db_column='role_id'
+        'core_roles.Role', 
+        on_delete=models.CASCADE, 
+        db_column='role_id'
     )
     assigned_at = models.DateTimeField(auto_now_add=True)
     assigned_by = models.ForeignKey(
@@ -17,6 +22,7 @@ class UserRole(models.Model):
         null=True,
         blank=True,
         db_column='assigned_by_user_id',
+        related_name='role_assignments_given',
     )
 
     class Meta:

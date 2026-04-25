@@ -1,0 +1,42 @@
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE/Editor files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Git files
+.git
+.gitignore
+
+# Test files (not needed in production)
+tests/
+test_*.py
+*_test.py
+.pytest_cache/
+
+# Documentation
+docs/
+README.md
+LICENSE
+
+# Build artifacts
+*.log

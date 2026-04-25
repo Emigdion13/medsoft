@@ -2,29 +2,35 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = 'change-me-in-production'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
 
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'false').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.auth',
-    'apps.core.organizations',
-    'apps.core.users',
-    'apps.core.roles',
-    'apps.core.permissions_app',
-    'apps.core.user_roles',
-    'apps.core.role_permissions',
-    'apps.core.audit',
-    'apps.core.access_logs',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'apps.core.organizations.apps.OrganizationsConfig',
+    'apps.core.users.apps.UsersConfig',
+    'apps.core.roles.apps.RolesConfig',
+    'apps.core.permissions_app.apps.PermissionsConfig',
+    'apps.core.user_roles.apps.UserRolesConfig',
+    'apps.core.role_permissions.apps.RolePermissionsConfig',
+    'apps.core.audit.apps.AuditConfig',
+    'apps.core.access_logs.apps.AccessLogsConfig',
     'apps.patients',
     'apps.doctors',
     'apps.appointments',
     'apps.encounters',
     'apps.clinical',
 ]
+
+ROOT_URLCONF = 'config.urls'
 
 DATABASES = {
     'default': {

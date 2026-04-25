@@ -31,15 +31,15 @@ class AuditLog(models.Model):
         ordering = ['-created_at']
         indexes = [
             models.Index(
-                fields=['organization', '-created_at'],
+                fields=['organization', 'created_at'],
                 name='audit_org_created_idx',
             ),
             models.Index(
-                fields=['entity_type', 'entity_id', '-created_at'],
+                fields=['entity_type', 'entity_id', 'created_at'],
                 name='audit_entity_idx',
             ),
             models.Index(
-                fields=['user', '-created_at'],
+                fields=['user', 'created_at'],
                 name='audit_user_created_idx',
             ),
         ]

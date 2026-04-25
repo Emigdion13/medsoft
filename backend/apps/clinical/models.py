@@ -2,16 +2,17 @@ import uuid
 
 from django.db import models
 
+from utils.constants import (
+    CLINICAL_NOTE_STATUS,
+    DIAGNOSIS_TYPES,
+    DIAGNOSIS_STATUS,
+    PRESCRIPTION_ROUTES,
+    PRESCRIPTION_STATUS,
+)
+
 
 class ClinicalNote(models.Model):
     """Notas médicas con firma e inmutabilidad."""
-
-    NOTE_TYPE_CHOICES = (('EVOLUCION', 'Evolución'),)
-    STATUS_CHOICES = (
-        ('BORRADOR', 'Borrador'),
-        ('FIRMADA', 'Firmada'),
-        ('ANULADA', 'Anulada'),
-    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     encounter = models.ForeignKey(
@@ -30,13 +31,14 @@ class ClinicalNote(models.Model):
     )
     content = models.TextField()
     status = models.CharField(
-        max_length=20, default='BORRADOR', choices=STATUS_CHOICES
+        max_length=20, default='BORRADOR', choices=CLINICAL_NOTE_STATUS
     )
 
     signed_by = models.ForeignKey(
         'core_users.User',
         on_delete=models.SET_NULL,
         db_column='signed_by',
+        related_name='clinical_notes_signed',
         blank=True,
         null=True,
     )
@@ -49,11 +51,13 @@ class ClinicalNote(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='created_by',
+        related_name='clinical_notes_created',
     )
     updated_by = models.ForeignKey(
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='updated_by',
+        related_name='clinical_notes_updated',
         blank=True,
         null=True,
     )
@@ -65,7 +69,7 @@ class ClinicalNote(models.Model):
         ordering = ['-created_at']
         constraints = [
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in CLINICAL_NOTE_STATUS]),
                 name='note_status_check',
             ),
             models.CheckConstraint(
@@ -78,10 +82,10 @@ class ClinicalNote(models.Model):
         ]
         indexes = [
             models.Index(
-                fields=['encounter', '-created_at'], name='note_encounter_idx'
+                fields=['encounter', 'created_at'], name='note_encounter_idx'
             ),
             models.Index(
-                fields=['doctor', '-created_at'], name='note_doctor_idx'
+                fields=['doctor', 'created_at'], name='note_doctor_idx'
             ),
             models.Index(
                 fields=['status'], name='note_status_idx'
@@ -95,17 +99,6 @@ class ClinicalNote(models.Model):
 class Diagnosis(models.Model):
     """Diagnósticos por encuentro (ICD-10)."""
 
-    DIAGNOSIS_TYPE_CHOICES = (
-        ('PRINCIPAL', 'Principal'),
-        ('SECUNDARIO', 'Secundario'),
-        ('COMORBILIDAD', 'Comorbilidad'),
-    )
-    STATUS_CHOICES = (
-        ('ACTIVO', 'Activo'),
-        ('RESUELTO', 'Resuelto'),
-        ('CANCELADO', 'Cancelado'),
-    )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     encounter = models.ForeignKey(
         'encounters.Encounter',
@@ -117,11 +110,11 @@ class Diagnosis(models.Model):
     description = models.CharField(max_length=255)
 
     diagnosis_type = models.CharField(
-        max_length=20, default='PRINCIPAL', choices=DIAGNOSIS_TYPE_CHOICES
+        max_length=20, default='PRINCIPAL', choices=DIAGNOSIS_TYPES
     )
     is_primary = models.BooleanField(default=False)
     status = models.CharField(
-        max_length=20, default='ACTIVO', choices=STATUS_CHOICES
+        max_length=20, default='ACTIVO', choices=DIAGNOSIS_STATUS
     )
 
     recorded_by = models.ForeignKey(
@@ -137,11 +130,11 @@ class Diagnosis(models.Model):
         ordering = ['-recorded_at']
         constraints = [
             models.CheckConstraint(
-                check=models.Q(diagnosis_type__in=[c[0] for c in DIAGNOSIS_TYPE_CHOICES]),
+                check=models.Q(diagnosis_type__in=[c[0] for c in DIAGNOSIS_TYPES]),
                 name='diag_type_check',
             ),
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in DIAGNOSIS_STATUS]),
                 name='diag_status_check',
             ),
         ]
@@ -164,20 +157,6 @@ class Diagnosis(models.Model):
 class Prescription(models.Model):
     """Indicaciones farmacológicas por encuentro."""
 
-    ROUTE_CHOICES = (
-        ('ORAL', 'Oral'),
-        ('IV', 'Intravenoso'),
-        ('IM', 'Intramuscular'),
-        ('TOPICA', 'Tópica'),
-        ('INHALADA', 'Inhalada'),
-    )
-    STATUS_CHOICES = (
-        ('ACTIVA', 'Activa'),
-        ('SUSPENDIDA', 'Suspendida'),
-        ('COMPLETADA', 'Completada'),
-        ('CANCELADA', 'Cancelada'),
-    )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     encounter = models.ForeignKey(
         'encounters.Encounter',
@@ -196,14 +175,14 @@ class Prescription(models.Model):
 
     dose = models.CharField(max_length=80)
     frequency = models.CharField(max_length=120)
-    route = models.CharField(max_length=30, choices=ROUTE_CHOICES)
+    route = models.CharField(max_length=30, choices=PRESCRIPTION_ROUTES)
 
     duration_days = models.IntegerField(blank=True, null=True)
     quantity = models.IntegerField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
 
     status = models.CharField(
-        max_length=20, default='ACTIVA', choices=STATUS_CHOICES
+        max_length=20, default='ACTIVA', choices=PRESCRIPTION_STATUS
     )
     prescribed_at = models.DateTimeField(
         db_column='prescribed_at', auto_now_add=True
@@ -213,7 +192,7 @@ class Prescription(models.Model):
         ordering = ['-prescribed_at']
         constraints = [
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in PRESCRIPTION_STATUS]),
                 name='rx_status_check',
             ),
             models.CheckConstraint(
@@ -226,7 +205,7 @@ class Prescription(models.Model):
         ]
         indexes = [
             models.Index(
-                fields=['encounter', '-prescribed_at'], name='rx_encounter_idx'
+                fields=['encounter', 'prescribed_at'], name='rx_encounter_idx'
             ),
             models.Index(
                 fields=['status'], name='rx_status_idx'

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(mkdir *)",
+      "Bash(npm *)",
+      "Bash(npm --prefix /Users/emi/Desktop/projects/medisoft/frontend run typecheck 2>&1 || true && npm --prefix /Users/emi/Desktop…)",
+      "Bash(npm --prefix /Users/emi/Desktop/projects/medisoft/frontend run typecheck 2>&1 || true && npm --prefix /Users/emi/Desktop…)",
+      "Bash(npm --prefix /Users/emi/Desktop/projects/medisoft/frontend run lint 2>&1 || true)",
+      "Bash(npm --prefix /Users/emi/Desktop/projects/medisoft/frontend run lint 2>&1 || true)",
+      "Bash(git -C /Users/emi/Desktop/projects/medisoft --no-pager status --short 2>&1 || true)",
+      "Bash(docker compose *)",
+      "Bash(docker compose -f /Users/emi/Desktop/projects/medisoft/docker-compose.yml --env-file /Users/emi/Desktop/projects/medisof…)",
+      "Bash(docker compose -f /Users/emi/Desktop/projects/medisoft/docker-compose.yml --env-file /Users/emi/Desktop/projects/medisof…)"
+    ]
+  },
+  "additionalDirectories": [
+    "/Users/emi/.abacusai/plans"
+  ]
+}

@@ -1,9 +1,12 @@
+import uuid
+
 from django.db import models
 
 
 class User(models.Model):
     """Identidad de usuarios del sistema (auth)."""
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey(
         'core_organizations.Organization',
         on_delete=models.PROTECT,
@@ -11,7 +14,8 @@ class User(models.Model):
     )
     username = models.CharField(max_length=150)
     email = models.EmailField(max_length=255)
-    full_name = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     password_hash = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     last_login_at = models.DateTimeField(null=True, blank=True)

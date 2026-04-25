@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.db.models.functions import TruncDate
 
 
 class Patient(models.Model):
@@ -59,6 +60,7 @@ class Patient(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='created_by',
+        related_name='patients_created',
         blank=True,
         null=True,
     )
@@ -66,6 +68,7 @@ class Patient(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='updated_by',
+        related_name='patients_updated',
         blank=True,
         null=True,
     )
@@ -90,17 +93,15 @@ class Patient(models.Model):
                 name='patient_status_check',
             ),
             models.CheckConstraint(
-                check=models.Q(birth_date__lte=models.functions.Now().date()),
+                check=models.Q(birth_date__lte=TruncDate(models.functions.Now())),
                 name='patient_birth_date_past_check',
             ),
             models.UniqueConstraint(
                 fields=['organization', 'cedula'],
-                condition=models.Q(cedula__isnull=False, deleted_at__isnull=True),
                 name='patient_org_cedula_unique',
             ),
             models.UniqueConstraint(
                 fields=['organization', 'passport_number'],
-                condition=models.Q(passport_number__isnull=False, deleted_at__isnull=True),
                 name='patient_org_passport_unique',
             ),
         ]

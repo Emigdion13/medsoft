@@ -1,10 +1,15 @@
+# Environment files - DO NOT COMMIT secrets!
+.env
+.venv
+
+# Generated files
 venv/
 __pycache__/
 *.pyc
-.env
-.venv
 *.log
 db.sqlite3
+
+# Frontend
 node_modules/
 frontend/build/
 npm-debug.log*

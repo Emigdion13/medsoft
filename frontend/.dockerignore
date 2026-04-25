@@ -1,0 +1,5 @@
+node_modules
+
+# Build artifacts (we build in the container)
+dist
+build

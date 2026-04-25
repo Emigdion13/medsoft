@@ -2,21 +2,14 @@ import uuid
 
 from django.db import models
 
+from utils.constants import (
+    ENCOUNTER_TYPES,
+    ENCOUNTER_STATUS,
+)
+
 
 class Encounter(models.Model):
     """Episodio clínico (ambulatorio/internamiento/emergencia/teleconsulta)."""
-
-    ENCOUNTER_TYPE_CHOICES = (
-        ('AMBULATORIO', 'Ambulatorio'),
-        ('INTERNAMIENTO', 'Internamiento'),
-        ('EMERGENCIA', 'Emergencia'),
-        ('TELECONSULTA', 'Teleconsulta'),
-    )
-    STATUS_CHOICES = (
-        ('ABIERTO', 'Abierto'),
-        ('CERRADO', 'Cerrado'),
-        ('CANCELADO', 'Cancelado'),
-    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     organization = models.ForeignKey(
@@ -43,10 +36,10 @@ class Encounter(models.Model):
     )
 
     encounter_type = models.CharField(
-        max_length=20, choices=ENCOUNTER_TYPE_CHOICES
+        max_length=20, choices=ENCOUNTER_TYPES
     )
     status = models.CharField(
-        max_length=20, default='ABIERTO', choices=STATUS_CHOICES
+        max_length=20, default='ABIERTO', choices=ENCOUNTER_STATUS
     )
     start_at = models.DateTimeField(db_column='start_at')
     end_at = models.DateTimeField(blank=True, null=True)
@@ -63,6 +56,7 @@ class Encounter(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='created_by',
+        related_name='encounters_created',
         blank=True,
         null=True,
     )
@@ -70,6 +64,7 @@ class Encounter(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='updated_by',
+        related_name='encounters_updated',
         blank=True,
         null=True,
     )
@@ -82,11 +77,11 @@ class Encounter(models.Model):
         ordering = ['start_at']
         constraints = [
             models.CheckConstraint(
-                check=models.Q(encounter_type__in=[c[0] for c in ENCOUNTER_TYPE_CHOICES]),
+                check=models.Q(encounter_type__in=[c[0] for c in ENCOUNTER_TYPES]),
                 name='enc_type_check',
             ),
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in ENCOUNTER_STATUS]),
                 name='enc_status_check',
             ),
             models.CheckConstraint(
@@ -99,7 +94,7 @@ class Encounter(models.Model):
         ]
         indexes = [
             models.Index(
-                fields=['patient', '-start_at'], name='enc_patient_start_idx'
+                fields=['patient', 'start_at'], name='enc_patient_start_idx'
             ),
             models.Index(
                 fields=['doctor', 'start_at'], name='enc_doctor_start_idx'
@@ -162,7 +157,7 @@ class VitalSign(models.Model):
         ordering = ['-recorded_at']
         indexes = [
             models.Index(
-                fields=['encounter', '-recorded_at'],
+                fields=['encounter', 'recorded_at'],
                 name='vitals_encounter_idx',
             ),
             models.Index(

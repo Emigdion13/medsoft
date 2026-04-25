@@ -2,19 +2,14 @@ import uuid
 
 from django.db import models
 
+from utils.constants import (
+    APPOINTMENT_TYPES,
+    APPOINTMENT_STATUS,
+)
+
 
 class Appointment(models.Model):
     """Agenda médica."""
-
-    APPOINTMENT_TYPE_CHOICES = (('CONSULTA', 'Consulta'),)
-    STATUS_CHOICES = (
-        ('PROGRAMADA', 'Programada'),
-        ('CONFIRMADA', 'Confirmada'),
-        ('EN_CURSO', 'En curso'),
-        ('COMPLETADA', 'Completada'),
-        ('CANCELADA', 'Cancelada'),
-        ('NO_ASISTIO', 'No asistió'),
-    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     organization = models.ForeignKey(
@@ -36,11 +31,11 @@ class Appointment(models.Model):
     start_at = models.DateTimeField(db_column='start_at')
     end_at = models.DateTimeField(db_column='end_at')
     appointment_type = models.CharField(
-        max_length=40, default='CONSULTA'
+        max_length=40, default='CONSULTA', choices=APPOINTMENT_TYPES
     )
     reason = models.TextField(blank=True, null=True)
     status = models.CharField(
-        max_length=20, default='PROGRAMADA', choices=STATUS_CHOICES
+        max_length=20, default='PROGRAMADA', choices=APPOINTMENT_STATUS
     )
     notes = models.TextField(blank=True, null=True)
 
@@ -48,6 +43,7 @@ class Appointment(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='created_by',
+        related_name='appointments_created',
         blank=True,
         null=True,
     )
@@ -55,6 +51,7 @@ class Appointment(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='updated_by',
+        related_name='appointments_updated',
         blank=True,
         null=True,
     )
@@ -71,7 +68,7 @@ class Appointment(models.Model):
                 name='appt_end_after_start_check',
             ),
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in APPOINTMENT_STATUS]),
                 name='appt_status_check',
             ),
         ]

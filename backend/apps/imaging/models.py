@@ -2,6 +2,12 @@ import uuid
 
 from django.db import models
 
+from utils.constants import (
+    IMAGING_ORDER_PRIORITY,
+    IMAGING_ORDER_STATUS,
+    IMAGING_REPORT_STATUS,
+)
+
 
 class ImagingTypeCatalog(models.Model):
     """Catálogo de estudios de imagen."""
@@ -21,15 +27,6 @@ class ImagingTypeCatalog(models.Model):
 
 class ImagingOrder(models.Model):
     """Órdenes de imágenes."""
-
-    PRIORITY_CHOICES = (('NORMAL', 'Normal'), ('URGENTE', 'Urgente'))
-    STATUS_CHOICES = (
-        ('PENDIENTE', 'Pendiente'),
-        ('REALIZADA', 'Realizada'),
-        ('EN_PROCESO', 'En proceso'),
-        ('COMPLETADA', 'Completada'),
-        ('CANCELADA', 'Cancelada'),
-    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     organization = models.ForeignKey(
@@ -60,10 +57,10 @@ class ImagingOrder(models.Model):
 
     order_number = models.CharField(max_length=50)
     priority = models.CharField(
-        max_length=20, default='NORMAL', choices=PRIORITY_CHOICES
+        max_length=20, default='NORMAL', choices=IMAGING_ORDER_PRIORITY
     )
     status = models.CharField(
-        max_length=20, default='PENDIENTE', choices=STATUS_CHOICES
+        max_length=20, default='PENDIENTE', choices=IMAGING_ORDER_STATUS
     )
     clinical_indication = models.TextField()
     ordered_at = models.DateTimeField(
@@ -98,11 +95,11 @@ class ImagingOrder(models.Model):
                 name='img_order_org_number_unique',
             ),
             models.CheckConstraint(
-                check=models.Q(priority__in=[c[0] for c in PRIORITY_CHOICES]),
+                check=models.Q(priority__in=[c[0] for c in IMAGING_ORDER_PRIORITY]),
                 name='img_order_priority_check',
             ),
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in IMAGING_ORDER_STATUS]),
                 name='img_order_status_check',
             ),
         ]
@@ -117,7 +114,7 @@ class ImagingOrder(models.Model):
                 fields=['status'], name='img_order_status_idx'
             ),
             models.Index(
-                fields=['-ordered_at'], name='img_order_ordered_at_idx'
+                fields=['ordered_at'], name='img_order_ordered_at_idx'
             ),
         ]
 
@@ -127,12 +124,6 @@ class ImagingOrder(models.Model):
 
 class ImagingReport(models.Model):
     """Informe de estudio de imagen (firmable)."""
-
-    STATUS_CHOICES = (
-        ('BORRADOR', 'Borrador'),
-        ('FIRMADA', 'Firmada'),
-        ('ANULADA', 'Anulada'),
-    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     imaging_order = models.ForeignKey(
@@ -163,7 +154,7 @@ class ImagingReport(models.Model):
     recommendations = models.TextField(blank=True, null=True)
 
     status = models.CharField(
-        max_length=20, default='BORRADOR', choices=STATUS_CHOICES
+        max_length=20, default='BORRADOR', choices=IMAGING_REPORT_STATUS
     )
     signed_at = models.DateTimeField(blank=True, null=True)
 
@@ -177,7 +168,7 @@ class ImagingReport(models.Model):
         ordering = ['-performed_at']
         constraints = [
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in IMAGING_REPORT_STATUS]),
                 name='img_report_status_check',
             ),
             models.CheckConstraint(
@@ -197,7 +188,7 @@ class ImagingReport(models.Model):
                 fields=['status'], name='img_report_status_idx'
             ),
             models.Index(
-                fields=['-performed_at'], name='img_report_performed_idx'
+                fields=['performed_at'], name='img_report_performed_idx'
             ),
         ]
 
@@ -238,7 +229,7 @@ class ImagingFile(models.Model):
                 fields=['imaging_order'], name='img_file_order_idx'
             ),
             models.Index(
-                fields=['-uploaded_at'], name='img_file_uploaded_idx'
+                fields=['uploaded_at'], name='img_file_uploaded_idx'
             ),
         ]
 

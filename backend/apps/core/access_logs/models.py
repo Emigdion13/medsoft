@@ -25,15 +25,15 @@ class AccessLog(models.Model):
         ordering = ['-created_at']
         indexes = [
             models.Index(
-                fields=['organization', '-created_at'],
+                fields=['organization', 'created_at'],
                 name='access_org_created_idx',
             ),
             models.Index(
-                fields=['resource_type', 'resource_id', '-created_at'],
+                fields=['resource_type', 'resource_id', 'created_at'],
                 name='access_resource_idx',
             ),
             models.Index(
-                fields=['user', '-created_at'],
+                fields=['user', 'created_at'],
                 name='access_user_created_idx',
             ),
         ]
