@@ -11,10 +11,13 @@ interface RequestOptions {
   retry?: boolean
 }
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+const BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 function buildUrl(path: string, params?: RequestOptions['params']) {
-  const url = new URL(`${BASE_URL}${path}`)
+  // If BASE_URL is a relative path (starts with /), use it as-is
+  // Otherwise construct full URL
+  const fullPath = BASE_URL.startsWith('/') ? `${BASE_URL}${path}` : `${BASE_URL}${path}`
+  const url = new URL(fullPath, window.location.origin)
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== null) url.searchParams.set(k, String(v))

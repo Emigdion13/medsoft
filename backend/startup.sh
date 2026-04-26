@@ -18,11 +18,16 @@ python manage.py migrate --noinput
 # Create default organization if not exists
 echo "Checking/defaulting organization..."
 python manage.py shell <<EOF
-from core.organizations.models import Organization
+from apps.core.organizations.models import Organization
 org, created = Organization.objects.get_or_create(
     name="Default Organization",
     defaults={
-        'description': 'Default organization for Medisoft',
+        'rnc': '123456789',
+        'phone': '+1-809-000-0000',
+        'email': 'contact@medisoft.local',
+        'address': 'Default address',
+        'province': 'Santo Domingo',
+        'municipality': 'Santo Domingo',
         'is_active': True,
     }
 )
@@ -32,12 +37,13 @@ EOF
 # Create default admin user if not exists
 echo "Checking/defaulting admin user..."
 python manage.py shell <<EOF
-from core.users.models import User
-from core.organizations.models import Organization
+from apps.core.users.models import User
+from apps.core.organizations.models import Organization
 import os
 
 org = Organization.objects.first()
 if org:
+    password = os.environ.get('DJANGO_ADMIN_PASSWORD', 'admin123')
     user, created = User.objects.get_or_create(
         username="admin",
         defaults={
@@ -45,17 +51,15 @@ if org:
             'email': os.environ.get('DJANGO_ADMIN_EMAIL', 'admin@medisoft.local'),
             'first_name': 'System',
             'last_name': 'Administrator',
-            'password_hash': 'pbkdf2_sha256$870000$yK4J3x1Q8Z9mN7pL6rF4sA3bC2dE1fG0hI9jK8lM7nO6pQ5rS4tU3vW2xY1zA0b==',
-            'is_active': True,
         }
     )
-    if created:
-        # In real implementation, use proper password hashing
-        user.password_hash = 'pbkdf2_sha256$870000$yK4J3x1Q8Z9mN7pL6rF4sA3bC2dE1fG0hI9jK8lM7nO6pQ5rS4tU3vW2xY1zA0b=='
+    if created or not user.check_password(password):
+        user.set_password(password)
+        user.is_active = True
         user.save()
-        print("Default admin user created (password: admin)")
+        print(f"Admin user {'created' if created else 'password reset'} (password: {password})")
     else:
-        print("Admin user already exists")
+        print("Admin user already exists with correct password")
 else:
     print("ERROR: No organization found!")
 EOF

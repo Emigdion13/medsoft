@@ -52,7 +52,7 @@ RUN MIGRATION_FILES=$(find /app -path "*/migrations/migrations/*.py" ! -name "__
 EXPOSE 8000
 
 # Startup script - copy and set executable before switching to non-root user
-COPY docker/startup.sh /startup.sh
+COPY startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
 USER appuser

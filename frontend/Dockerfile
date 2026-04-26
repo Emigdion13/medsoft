@@ -9,8 +9,9 @@ COPY . .
 # Install all dependencies (including dev for building)
 RUN npm ci
 
-# Set environment variables
-ENV VITE_API_URL=http://backend:8000/api
+# Set environment variables for production build
+# In Docker, the frontend serves from same origin, so API path is relative
+ENV VITE_API_URL=/api
 
 # Build the application
 RUN npm run build
@@ -21,8 +22,11 @@ FROM nginx:alpine
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Remove default nginx config to avoid conflicts
+RUN rm -f /etc/nginx/conf.d/default.conf || true
+
+# Copy custom nginx configuration (with api proxy to backend)
+COPY nginx.conf /etc/nginx/conf.d/
 
 EXPOSE 80
 

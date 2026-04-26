@@ -42,6 +42,8 @@ def login_view(request: Request) -> Response:
         # TODO: Update last_login_at
 
         response_serializer = AuthResponseSerializer({
+            'access': '',
+            'refresh': '',
             'user': user,
         })
         return Response(response_serializer.data)
@@ -65,6 +67,8 @@ def register_view(request: Request) -> Response:
     # TODO: Generate tokens for newly registered user
 
     response_serializer = AuthResponseSerializer({
+        'access': '',
+        'refresh': '',
         'user': user,
     })
     return Response(response_serializer.data, status=status.HTTP_201_CREATED)

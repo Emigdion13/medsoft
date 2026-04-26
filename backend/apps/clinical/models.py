@@ -73,9 +73,9 @@ class ClinicalNote(models.Model):
                 name='note_status_check',
             ),
             models.CheckConstraint(
-                check=models.Q(
+                check=(
                     models.Q(status='FIRMADA', signed_by__isnull=False, signed_at__isnull=False)
-                    | models.Q(status__ne='FIRMADA')
+                    | ~models.Q(status='FIRMADA')
                 ),
                 name='note_signed_check',
             ),
