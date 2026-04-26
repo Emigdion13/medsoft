@@ -1,0 +1,20 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: medisoft_frontend_dev
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    env_file:
+      - .env.docker
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8000}
+      VITE_API_URL: /api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - medisoft_network

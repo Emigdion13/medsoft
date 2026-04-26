@@ -23,15 +23,17 @@ class Organization(models.Model):
 
     class Meta:
         ordering = ['id']
-        indexes = [
-            models.Index(
-                fields=['is_active'],
-                name='org_is_active_idx',
-            ),
+        constraints = [
             models.UniqueConstraint(
                 fields=['rnc'],
                 condition=models.Q(rnc__isnull=False),
                 name='org_rnc_unique',
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=['is_active'],
+                name='org_is_active_idx',
             ),
         ]
 

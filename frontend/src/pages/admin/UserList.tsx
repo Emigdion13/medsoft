@@ -10,15 +10,54 @@ interface UserListProps {
 export function UserList({ onSelectEdit }: UserListProps) {
   const [users, setUsers] = useState<UserListItem[]>([])
   const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const load = async () => {
-    const res = await usersService.list({ search, page: 1 })
-    setUsers(res.results)
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await usersService.list({ search, page: 1 })
+      console.log('[UserList] API Response:', res)
+      console.log('[UserList] Results:', res?.results)
+      setUsers(res?.results ?? [])
+    } catch (err) {
+      console.error('Error loading users:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load users')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
     void load()
   }, [])
+
+  if (loading && users.length === 0) {
+    return (
+      <PageContainer title="Users">
+        <div>Loading...</div>
+      </PageContainer>
+    )
+  }
+
+  if (error) {
+    return (
+      <PageContainer title="Users">
+        <div style={{ color: 'red' }}>Error: {error}</div>
+        <button onClick={() => void load()}>Retry</button>
+      </PageContainer>
+    )
+  }
+
+  // Safety check - if users is still undefined or null
+  if (!users || !Array.isArray(users)) {
+    return (
+      <PageContainer title="Users">
+        <div style={{ color: 'red' }}>Invalid data received</div>
+      </PageContainer>
+    )
+  }
 
   return (
     <PageContainer title="Users">

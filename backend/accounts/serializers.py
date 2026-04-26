@@ -8,7 +8,6 @@ class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model."""
 
     id = serializers.UUIDField(source='pk', read_only=True)
-    role = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -20,13 +19,9 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'role',
             'is_active',
+            'is_staff',
         ]
-        read_only_fields = ['id', 'is_active']
-
-    def get_role(self, obj: User) -> str:
-        """Get primary role for user."""
-        # TODO: Implement actual role lookup via user_roles table
-        return 'RECEPTIONIST'  # Default fallback
+        read_only_fields = ['id', 'is_active', 'is_staff']
 
 
 class LoginSerializer(serializers.Serializer):

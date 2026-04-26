@@ -48,7 +48,20 @@
       "Bash(echo.)",
       "Bash(copy *)",
       "Bash(taskkill *)",
-      "Bash(del *)"
+      "Bash(del *)",
+      "Bash(rmdir *)",
+      "Bash(dir *)",
+      "Bash(.venv\\scripts\\activate)",
+      "Bash(pip install *)",
+      "Bash(pg_isready *)",
+      "Bash(.venv\\scripts\\python *)",
+      "Bash(set *)",
+      "Bash(type *)",
+      "Bash(from *)",
+      "Bash(u *)",
+      "Bash(print)",
+      "Bash(\")\")",
+      "Bash(git add *)"
     ]
   },
   "$version": 3

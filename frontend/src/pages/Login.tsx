@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../utils/auth'
 
 export default function Login() {
@@ -36,9 +36,6 @@ export default function Login() {
         <button disabled={submitting} style={{ width: '100%', padding: 10, background: '#2563eb', color: '#fff', border: 0, borderRadius: 8 }}>
           {submitting ? 'Signing in...' : 'Sign in'}
         </button>
-        <p style={{ marginTop: 10 }}>
-          No account? <Link to="/register">Register</Link>
-        </p>
       </form>
     </div>
   )

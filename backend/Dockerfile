@@ -39,15 +39,6 @@ RUN sed -i 's/for field, _ in index\.fields_orders/for field in getattr(index, "
 # Copy application code
 COPY . .
 
-# Generate Django migrations if none exist (needed for fresh database setup)
-RUN MIGRATION_FILES=$(find /app -path "*/migrations/migrations/*.py" ! -name "__init__.py" 2>/dev/null | head -5); \
-    if [ -z "$MIGRATION_FILES" ]; then \
-        echo "No migration files found. Generating initial migrations..."; \
-        python manage.py makemigrations --noinput || true; \
-    else \
-        echo "Migration files already exist, skipping generation."; \
-    fi
-
 # Expose port
 EXPOSE 8000
 

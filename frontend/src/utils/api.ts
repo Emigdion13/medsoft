@@ -49,6 +49,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const { method = 'GET', body, params, headers = {}, retry = true } = options
   const token = session.getAccessToken()
 
+  console.log('[API Request]', {
+    url: buildUrl(path, params),
+    method,
+    hasToken: !!token,
+    tokenPrefix: token ? token.slice(0, 20) + '...' : 'none',
+    path,
+  })
+
   const res = await fetch(buildUrl(path, params), {
     method,
     headers: {
@@ -59,13 +67,23 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
 
+  console.log('[API Response]', {
+    path,
+    status: res.status,
+    statusText: res.statusText,
+    ok: res.ok,
+  })
+
   if (res.status === 401 && retry) {
+    console.log('[API] 401 received, attempting token refresh...')
     const refreshed = await refreshAccessToken()
     if (refreshed) {
+      console.log('[API] Token refreshed successfully')
       return request<T>(path, { ...options, retry: false })
     }
+    console.warn('[API] Token refresh failed, clearing session')
     session.clear()
-    throw new Error('Session expired')
+    throw new Error('Session expired. Please log in again.')
   }
 
   const text = await res.text()
@@ -73,6 +91,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   if (!res.ok) {
     const message = data?.detail || data?.message || 'Request failed'
+    console.error('[API Error]', { path, status: res.status, message, response: data })
     throw new Error(message)
   }
 

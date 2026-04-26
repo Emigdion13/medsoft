@@ -30,7 +30,6 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
 
       <Route
         path="/dashboard"
@@ -49,6 +48,17 @@ export default function App() {
           <ProtectedLayout>
             <CanAccessRoute module="users">
               <AdminUsersPage />
+            </CanAccessRoute>
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/admin/users/register"
+        element={
+          <ProtectedLayout>
+            <CanAccessRoute module="users">
+              <Register />
             </CanAccessRoute>
           </ProtectedLayout>
         }

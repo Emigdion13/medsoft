@@ -48,6 +48,7 @@ export default function Register() {
         <input value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
         <label>Role</label>
         <select value={role} onChange={(e) => setRole(e.target.value as UserRole)} style={{ width: '100%', marginBottom: 10, padding: 10 }}>
+          <option value="ADMINISTRATOR">Administrator</option>
           <option value="DOCTOR">Doctor</option>
           <option value="NURSE">Nurse</option>
           <option value="SECRETARY">Secretary</option>

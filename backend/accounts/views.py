@@ -16,6 +16,7 @@ from .serializers import (
     TokenRefreshSerializer,
     UserSerializer,
 )
+from .token_utils import get_tokens_for_user
 
 
 @api_view(['POST'])
@@ -28,22 +29,19 @@ def login_view(request: Request) -> Response:
     username = serializer.validated_data['username']
     password = serializer.validated_data['password']
 
-    # TODO: Implement proper authentication
     try:
         user = User.objects.get(username=username, is_active=True)
-        # TODO: Verify password
         if not user.check_password(password):
             return Response(
                 {'detail': 'Invalid credentials'},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        # TODO: Generate tokens
-        # TODO: Update last_login_at
+        tokens = get_tokens_for_user(user)
 
         response_serializer = AuthResponseSerializer({
-            'access': '',
-            'refresh': '',
+            'access': tokens['access'],
+            'refresh': tokens['refresh'],
             'user': user,
         })
         return Response(response_serializer.data)
@@ -58,17 +56,16 @@ def login_view(request: Request) -> Response:
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_view(request: Request) -> Response:
-    """Register new user."""
+    """Register new user and return tokens."""
     serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
     user = serializer.save()
-
-    # TODO: Generate tokens for newly registered user
+    tokens = get_tokens_for_user(user)
 
     response_serializer = AuthResponseSerializer({
-        'access': '',
-        'refresh': '',
+        'access': tokens['access'],
+        'refresh': tokens['refresh'],
         'user': user,
     })
     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
@@ -81,10 +78,24 @@ def refresh_token_view(request: Request) -> Response:
     serializer = TokenRefreshSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    # TODO: Implement token refresh logic
     refresh_token = serializer.validated_data['refresh']
 
-    return Response({'detail': 'Not implemented yet'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+    # Use SimpleJWT to validate and refresh the token
+    from rest_framework_simplejwt.tokens import RefreshToken
+
+    try:
+        refresh = RefreshToken(refresh_token)
+        access_token = str(refresh.access_token)
+        
+        return Response({
+            'access': access_token,
+            'refresh': refresh_token,
+        })
+    except Exception:
+        return Response(
+            {'detail': 'Invalid refresh token'},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
 
 
 @api_view(['GET'])
