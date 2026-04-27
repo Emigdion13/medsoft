@@ -1,14 +1,13 @@
-FROM mcr.microsoft.com/playwright:v1.40.0
+FROM mcr.microsoft.com/playwright:v1.59.1-jammy
 
-WORKDIR /app/test/e2e
+WORKDIR /app
 
-# Copy all test files at once
-COPY . .
+# Install Playwright browser dependencies
+RUN npx playwright install-deps chromium
 
-# Install dependencies
+COPY package.json package-lock.json* ./
 RUN npm install
 
-# Create results directory for HTML report
-RUN mkdir -p test-results/html
+COPY . .
 
-CMD ["npm", "run", "test"]
+CMD ["npx", "playwright", "test", "--reporter=html"]

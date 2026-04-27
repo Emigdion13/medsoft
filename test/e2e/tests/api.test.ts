@@ -5,9 +5,12 @@ const backendURL = process.env.TEST_BACKEND_URL || 'http://localhost:8000';
 
 test.describe('Backend API Tests', () => {
   let apiContext: any;
+  let token: string;
 
   test.beforeAll(async () => {
-    apiContext = await getAuthenticatedContext(backendURL);
+    const result = await getAuthenticatedContext(backendURL);
+    apiContext = result.context;
+    token = result.token;
   }, { timeout: 30000 });
 
   test('GET /health/ - should return healthy status', async ({ request }) => {
@@ -21,7 +24,9 @@ test.describe('Backend API Tests', () => {
   }, { timeout: 30000 });
 
   test('GET /api/users/ - should return users list', async () => {
-    const response = await apiContext.get('/api/users/');
+    const response = await apiContext.get('/api/users/', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     expect(response.ok()).toBeTruthy();
     const data = await response.json();

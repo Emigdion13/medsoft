@@ -70,7 +70,22 @@
       "Bash(cp *)",
       "Bash(tr *)",
       "Bash(git rm *)",
-      "Bash(git reset *)"
+      "Bash(git reset *)",
+      "Bash(npm test *)",
+      "Bash(lsof *)",
+      "Bash(kill *)",
+      "Bash(npm run *)",
+      "Bash(nohup *)",
+      "Bash(disown)",
+      "Bash(xargs *)",
+      "Bash(node *)",
+      "Bash(grep *)",
+      "Bash(git show *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git restore *)",
+      "Bash(which *)",
+      "Bash(setsid *)"
     ]
   },
   "$version": 3

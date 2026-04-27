@@ -12,10 +12,17 @@ services:
       - DJANGO_SETTINGS_MODULE=config.settings_docker
       - DATABASE_URL=postgresql://medisoft:medisoft@db:5432/medisoft
       - SECRET_KEY=${SECRET_KEY:-django-insecure-change-me}
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend,medisoft-frontend
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend,medisoft-frontend,medisoft-backend
+      - DJANGO_ADMIN_PASSWORD=admin
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - medisoft-network
 
@@ -44,25 +51,29 @@ services:
     ports:
       - "3000:80"
     environment:
-      - REACT_APP_API_URL=http://localhost:8000/api
+      - VITE_API_URL=http://medisoft-backend:8000/api
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
     networks:
       - medisoft-network
 
   test-runner:
-    image: mcr.microsoft.com/playwright:v1.59.1-jammy
+    build:
+      context: ./test/e2e
+      dockerfile: Dockerfile
     container_name: medisoft-test-runner
-    working_dir: /app/test/e2e
+    working_dir: /app
     volumes:
-      - ./test/e2e:/app/test/e2e
-      - ./backend:/app/backend
+      - ./test/e2e:/app
+      - ./frontend:/app/frontend
     environment:
       - TEST_BASE_URL=http://medisoft-frontend:80
       - TEST_BACKEND_URL=http://medisoft-backend:8000
       - PLAYWRIGHT_HTML_REPORT=test-results/html
-    command: ["npx", "playwright", "test"]
+    depends_on:
+      - frontend
+      - backend
     networks:
       - medisoft-network
 

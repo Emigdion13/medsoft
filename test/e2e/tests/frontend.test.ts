@@ -13,12 +13,13 @@ test.describe('Frontend UI Tests', () => {
   });
 
   test('should display dashboard with welcome message', async ({ page }) => {
-    // Check for dashboard header or title
-    await expect(page.locator('h2').or(page.getByRole('heading'))).toBeVisible({ timeout: 5000 });
+    // Check for dashboard heading
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({ timeout: 5000 });
 
     // Verify key dashboard cards are visible
-    const cards = page.locator('[style*="background: #fff"]');
-    await expect(cards.first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Today Appointments' })).toBeVisible();
+    await expect(page.getByText('Pending Tasks')).toBeVisible();
+    await expect(page.getByText('Alerts')).toBeVisible();
   }, { timeout: 30000 });
 
   test('should navigate to dashboard when clicking Dashboard link', async ({ page }) => {
@@ -28,7 +29,7 @@ test.describe('Frontend UI Tests', () => {
   }, { timeout: 30000 });
 
   test('should navigate to appointments page when clicking Appointments link', async ({ page }) => {
-    await page.getByRole('link', { name: 'Appointments' }).click();
+    await page.getByRole('link', { name: 'Appointments', exact: true }).click();
     await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
     await expect(page.getByRole('heading', { name: 'Appointments' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
