@@ -62,7 +62,8 @@
       "Bash(print)",
       "Bash(\")\")",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   },
   "$version": 3
