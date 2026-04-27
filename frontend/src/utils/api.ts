@@ -13,16 +13,25 @@ interface RequestOptions {
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
-function buildUrl(path: string, params?: RequestOptions['params']) {
-  // If BASE_URL is a relative path (starts with /), use it as-is
-  // Otherwise construct full URL
-  const fullPath = BASE_URL.startsWith('/') ? `${BASE_URL}${path}` : `${BASE_URL}${path}`
-  const url = new URL(fullPath, window.location.origin)
+function buildUrl(path: string, params?: RequestOptions['params']): string {
+  // Remove leading slash from path if present to avoid double slashes
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  
+  // If BASE_URL is a full URL, use it directly
+  if (BASE_URL.startsWith('http://') || BASE_URL.startsWith('https://')) {
+    return `${BASE_URL}${cleanPath}`
+  }
+  
+  // For relative paths, construct with window location
+  const url = new URL(`${BASE_URL}${cleanPath}`, window.location.origin)
+  
+  // Add query params if present
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== null) url.searchParams.set(k, String(v))
     })
   }
+  
   return url.toString()
 }
 
