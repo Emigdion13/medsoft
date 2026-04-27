@@ -63,7 +63,14 @@
       "Bash(\")\")",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(tee *)",
+      "Bash(mv *)",
+      "Bash(npm install)",
+      "Bash(cp *)",
+      "Bash(tr *)",
+      "Bash(git rm *)",
+      "Bash(git reset *)"
     ]
   },
   "$version": 3

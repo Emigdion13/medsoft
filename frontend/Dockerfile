@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . .
 
 # Install all dependencies (including dev for building)
-RUN npm ci
+RUN npm install --include=dev
 
 # Set environment variables for production build
 # In Docker, the frontend serves from same origin, so API path is relative

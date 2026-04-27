@@ -1,78 +1,74 @@
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: medisoft_db
-    environment:
-      POSTGRES_DB: ${DB_NAME:-medisoft}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-medisoft}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    networks:
-      - medisoft_network
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: medisoft_backend
+    container_name: medisoft-backend
+    ports:
+      - "8000:8000"
     env_file:
       - .env.docker
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings_docker
+      - DATABASE_URL=postgresql://medisoft:medisoft@db:5432/medisoft
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-me}
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend,medisoft-frontend
     depends_on:
       db:
         condition: service_healthy
-    ports:
-      - "${BACKEND_PORT:-8000}:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
     networks:
-      - medisoft_network
+      - medisoft-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: medisoft-db
+    environment:
+      - POSTGRES_USER=medisoft
+      - POSTGRES_PASSWORD=medisoft
+      - POSTGRES_DB=medisoft
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medisoft"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medisoft-network
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
-    container_name: medisoft_frontend_dev
+      dockerfile: Dockerfile
+    container_name: medisoft-frontend
     ports:
-      - "${FRONTEND_PORT:-5173}:5173"
-    env_file:
-      - .env.docker
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/dist
-    depends_on:
-      - backend
-    networks:
-      - medisoft_network
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: medisoft_pgadmin
+      - "3000:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@medisoft.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-    ports:
-      - "${PGADMIN_PORT:-8081}:80"
+      - REACT_APP_API_URL=http://localhost:8000/api
     depends_on:
-      db:
-        condition: service_healthy
+      backend:
+        condition: service_started
     networks:
-      - medisoft_network
+      - medisoft-network
+
+  test-runner:
+    image: mcr.microsoft.com/playwright:v1.59.1-jammy
+    container_name: medisoft-test-runner
+    working_dir: /app/test/e2e
+    volumes:
+      - ./test/e2e:/app/test/e2e
+      - ./backend:/app/backend
+    environment:
+      - TEST_BASE_URL=http://medisoft-frontend:80
+      - TEST_BACKEND_URL=http://medisoft-backend:8000
+      - PLAYWRIGHT_HTML_REPORT=test-results/html
+    command: ["npx", "playwright", "test"]
+    networks:
+      - medisoft-network
+
+networks:
+  medisoft-network:
+    driver: bridge
 
 volumes:
   postgres_data:
-
-networks:
-  medisoft_network:
-    driver: bridge
