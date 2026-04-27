@@ -11,6 +11,8 @@ interface RequestOptions {
   retry?: boolean
 }
 
+// Use /api as the default so the Vite dev proxy handles routing during local dev.
+// Docker builds override this via ENV VITE_API_URL=/api in the Dockerfile.
 const BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 function buildUrl(path: string, params?: RequestOptions['params']): string {

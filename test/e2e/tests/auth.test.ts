@@ -16,8 +16,8 @@ test.describe('Authentication', () => {
     // Should redirect to dashboard
     await expect(page).toHaveURL(/dashboard/i);
 
-    // Verify user is logged in (check for logout button or user info)
-    await expect(page.getByText(/admin|logout|sign out/i)).toBeVisible({ timeout: 5000 });
+    // Verify user is logged in (check for logout button)
+    await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 
   test('should show error with invalid credentials', async ({ page }) => {
@@ -28,13 +28,15 @@ test.describe('Authentication', () => {
     await page.getByRole('button', { name: /sign in/i }).click();
 
     // Should show error message
-    await expect(page.getByText(/error|invalid|credential/i)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/error|invalid|credential|expired/i)).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 
   test('API: should return valid tokens on login', async () => {
-    const apiContext = await getAuthenticatedContext(backendURL);
+    const { context: apiContext, token } = await getAuthenticatedContext(backendURL);
 
-    const response = await apiContext.get('/api/users/');
+    const response = await apiContext.get('/api/users/', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();

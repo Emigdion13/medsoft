@@ -38,11 +38,8 @@ export const getAuthenticatedContext = async (
   const apiContext = await createAPIContext(baseURL);
   const { access } = await performLogin(apiContext, username, password);
 
-  return await request.newContext({
-    baseURL,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${access}`,
-    },
-  });
+  return {
+    context: apiContext,
+    token: access,
+  };
 };

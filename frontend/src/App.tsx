@@ -5,6 +5,9 @@ import TopBar from './components/layout/TopBar'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Appointments from './pages/Appointments'
+import Patients from './pages/Patients'
+import MedicalRecords from './pages/MedicalRecords'
 import AdminUsersPage from './pages/admin/UsersPage'
 import { CanAccessRoute } from './lib/rbac/guards'
 import { useAuth } from './utils/auth'
@@ -37,6 +40,39 @@ export default function App() {
           <ProtectedLayout>
             <CanAccessRoute module="dashboard">
               <Dashboard />
+            </CanAccessRoute>
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/appointments"
+        element={
+          <ProtectedLayout>
+            <CanAccessRoute module="appointments">
+              <Appointments />
+            </CanAccessRoute>
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/patients"
+        element={
+          <ProtectedLayout>
+            <CanAccessRoute module="patients">
+              <Patients />
+            </CanAccessRoute>
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/medical-records"
+        element={
+          <ProtectedLayout>
+            <CanAccessRoute module="medical_records">
+              <MedicalRecords />
             </CanAccessRoute>
           </ProtectedLayout>
         }

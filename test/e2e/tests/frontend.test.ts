@@ -21,6 +21,40 @@ test.describe('Frontend UI Tests', () => {
     await expect(cards.first()).toBeVisible();
   }, { timeout: 30000 });
 
+  test('should navigate to dashboard when clicking Dashboard link', async ({ page }) => {
+    await page.getByRole('link', { name: 'Dashboard' }).click();
+    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 5000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({ timeout: 5000 });
+  }, { timeout: 30000 });
+
+  test('should navigate to appointments page when clicking Appointments link', async ({ page }) => {
+    await page.getByRole('link', { name: 'Appointments' }).click();
+    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page.getByRole('heading', { name: 'Appointments' })).toBeVisible({ timeout: 5000 });
+  }, { timeout: 30000 });
+
+  test('should navigate to patients page when clicking Patients link', async ({ page }) => {
+    await page.getByRole('link', { name: 'Patients' }).click();
+    await expect(page).toHaveURL(/\/patients$/, { timeout: 5000 });
+    await expect(page.getByRole('heading', { name: 'Patients' })).toBeVisible({ timeout: 5000 });
+  }, { timeout: 30000 });
+
+  test('should navigate to medical records page when clicking Medical Records link', async ({ page }) => {
+    await page.getByRole('link', { name: 'Medical Records' }).click();
+    await expect(page).toHaveURL(/\/medical-records$/, { timeout: 5000 });
+    await expect(page.getByRole('heading', { name: 'Medical Records' })).toBeVisible({ timeout: 5000 });
+  }, { timeout: 30000 });
+
+  test('should navigate to user management when clicking User Management link', async ({ page }) => {
+    await page.getByRole('link', { name: 'User Management' }).click();
+    await expect(page).toHaveURL(/\/admin\/users$/, { timeout: 5000 });
+  }, { timeout: 30000 });
+
+  test('should log out when clicking Logout button', async ({ page }) => {
+    await page.getByRole('button', { name: 'Logout' }).click();
+    await expect(page).toHaveURL(/\/login$/, { timeout: 5000 });
+  }, { timeout: 30000 });
+
   test('should have working navigation from dashboard', async ({ page }) => {
     const links = page.locator('a');
     const linkCount = await links.count();
