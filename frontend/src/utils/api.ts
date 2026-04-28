@@ -49,10 +49,12 @@ async function refreshAccessToken(): Promise<string | null> {
 
   if (!res.ok) return null
   const data = (await res.json()) as Partial<AuthResponse> & { access?: string }
-  const access = data.access || data.access
+  const access = data.access
   if (!access) return null
 
-  session.setTokens({ access, refresh })
+  // Backend may rotate the refresh token; use the new one if provided
+  const newRefresh = data.refresh ?? refresh
+  session.setTokens({ access, refresh: newRefresh })
   return access
 }
 
@@ -92,7 +94,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       console.log('[API] Token refreshed successfully')
       return request<T>(path, { ...options, retry: false })
     }
-    console.warn('[API] Token refresh failed, clearing session')
+    console.warn('[API] Token refresh failed — session expired')
     session.clear()
     throw new Error('Session expired. Please log in again.')
   }
