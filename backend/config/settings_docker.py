@@ -11,6 +11,8 @@ ALLOWED_HOSTS = os.environ.get(
     'localhost,127.0.0.1,medisoft-frontend'
 ).split(',')
 
+STATIC_URL = '/static/'
+
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.auth',

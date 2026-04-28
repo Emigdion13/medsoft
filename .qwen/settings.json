@@ -85,7 +85,9 @@
       "Bash(git log *)",
       "Bash(git restore *)",
       "Bash(which *)",
-      "Bash(setsid *)"
+      "Bash(setsid *)",
+      "Bash(python3 *)",
+      "Bash(python3.12 *)"
     ]
   },
   "$version": 3

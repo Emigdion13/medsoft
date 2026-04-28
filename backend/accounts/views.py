@@ -8,6 +8,9 @@ from rest_framework.response import Response
 from django.utils import timezone
 
 from apps.core.users.models import User
+from apps.doctors.models import Specialty, Doctor
+from apps.patients.models import Patient
+from apps.appointments.models import Appointment
 
 from .serializers import (
     AuthResponseSerializer,
@@ -15,6 +18,10 @@ from .serializers import (
     RegisterSerializer,
     TokenRefreshSerializer,
     UserSerializer,
+    SpecialtySerializer,
+    DoctorSerializer,
+    PatientSerializer,
+    AppointmentSerializer,
 )
 from .token_utils import get_tokens_for_user
 
@@ -130,9 +137,8 @@ class UserViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer: UserSerializer) -> None:
-        """Set organization on create."""
-        # TODO: Set organization from request.user.organization
-        serializer.save()
+        """Set organization from the requesting user."""
+        serializer.save(organization=self.request.user.organization)
 
     def perform_update(self, serializer: UserSerializer) -> None:
         """Handle role updates and other business logic."""
@@ -142,3 +148,122 @@ class UserViewSet(viewsets.ModelViewSet):
         """Soft delete user."""
         instance.deleted_at = timezone.now()
         instance.save(update_fields=['deleted_at'])
+
+
+# ── Specialty ViewSet ─────────────────────────────────────────────────
+
+class SpecialtyViewSet(viewsets.ModelViewSet):
+    """CRUD operations for medical specialties."""
+
+    queryset = Specialty.objects.filter(is_active=True)
+    serializer_class = SpecialtySerializer
+    permission_classes = [IsAuthenticated]
+
+
+# ── Doctor ViewSet ────────────────────────────────────────────────────
+
+class DoctorViewSet(viewsets.ModelViewSet):
+    """CRUD operations for doctors."""
+
+    queryset = Doctor.objects.filter(is_active=True, deleted_at__isnull=True)
+    serializer_class = DoctorSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self) -> Any:
+        """Filter by organization and optionally search."""
+        qs = super().get_queryset()
+
+        # Filter by the organization of the authenticated user
+        user = self.request.user
+        if hasattr(user, 'organization') and user.organization:
+            qs = qs.filter(organization=user.organization)
+
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(
+                first_name__icontains=search
+            ) | qs.filter(
+                last_name__icontains=search
+            ) | qs.filter(
+                cedula__icontains=search
+            )
+
+        return qs
+
+    def perform_create(self, serializer: Any) -> None:
+        """Set organization from the requesting user."""
+        serializer.save(organization=self.request.user.organization)
+
+
+# ── Patient ViewSet ───────────────────────────────────────────────────
+
+class PatientViewSet(viewsets.ModelViewSet):
+    """CRUD operations for patients."""
+
+    queryset = Patient.objects.filter(deleted_at__isnull=True)
+    serializer_class = PatientSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self) -> Any:
+        """Filter by organization and optionally search."""
+        qs = super().get_queryset()
+
+        # Filter by the organization of the authenticated user
+        user = self.request.user
+        if hasattr(user, 'organization') and user.organization:
+            qs = qs.filter(organization=user.organization)
+
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(
+                first_name__icontains=search
+            ) | qs.filter(
+                last_name__icontains=search
+            ) | qs.filter(
+                cedula__icontains=search
+            )
+
+        return qs
+
+    def perform_create(self, serializer: Any) -> None:
+        """Set organization from the requesting user."""
+        serializer.save(organization=self.request.user.organization)
+
+
+# ── Appointment ViewSet ───────────────────────────────────────────────
+
+class AppointmentViewSet(viewsets.ModelViewSet):
+    """CRUD operations for appointments."""
+
+    queryset = Appointment.objects.select_related(
+        'doctor', 'patient', 'created_by'
+    ).order_by('-start_at')
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self) -> Any:
+        """Filter by organization and optionally by date."""
+        qs = super().get_queryset()
+
+        user = self.request.user
+        if hasattr(user, 'organization') and user.organization:
+            qs = qs.filter(
+                doctor__organization=user.organization
+            ) | qs.filter(
+                patient__organization=user.organization
+            )
+
+        # Filter by date range if provided
+        date_param = self.request.query_params.get('date')
+        if date_param:
+            from django.db.models import Q
+            qs = qs.filter(
+                Q(start_at__date=date_param)
+                | Q(end_at__date=date_param)
+            )
+
+        return qs
+
+    def perform_create(self, serializer: AppointmentSerializer) -> None:
+        """Set organization from the requesting user."""
+        serializer.save(organization=self.request.user.organization)

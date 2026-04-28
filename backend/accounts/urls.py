@@ -7,10 +7,18 @@ from .views import (
     refresh_token_view,
     me_view,
     UserViewSet,
+    SpecialtyViewSet,
+    DoctorViewSet,
+    PatientViewSet,
+    AppointmentViewSet,
 )
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
+router.register(r'specialties', SpecialtyViewSet, basename='specialty')
+router.register(r'doctors', DoctorViewSet, basename='doctor')
+router.register(r'patients', PatientViewSet, basename='patient')
+router.register(r'appointments', AppointmentViewSet, basename='appointment')
 
 urlpatterns = [
     path('auth/login/', login_view, name='login'),
