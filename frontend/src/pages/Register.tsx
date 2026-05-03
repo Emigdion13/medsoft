@@ -20,7 +20,7 @@ export default function Register() {
     e.preventDefault()
     setError('')
     if (password !== confirm_password) {
-      setError('Passwords do not match')
+      setError('Las contraseñas no coinciden')
       return
     }
     setSubmitting(true)
@@ -28,7 +28,7 @@ export default function Register() {
       await register({ username, email, first_name, last_name, role, password, confirm_password })
       navigate('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
+      setError(err instanceof Error ? err.message : 'Error en el registro')
     } finally {
       setSubmitting(false)
     }
@@ -37,34 +37,34 @@ export default function Register() {
   return (
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
       <form onSubmit={onSubmit} style={{ width: 420, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 20 }}>
-        <h2 style={{ marginTop: 0 }}>Register</h2>
-        <label>First name</label>
+        <h2 style={{ marginTop: 0 }}>Registro</h2>
+        <label>Nombre</label>
         <input value={first_name} onChange={(e) => setFirstName(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
-        <label>Last name</label>
+        <label>Apellido</label>
         <input value={last_name} onChange={(e) => setLastName(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
-        <label>Username</label>
+        <label>Nombre de usuario</label>
         <input value={username} onChange={(e) => setUsername(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
         <label>Email</label>
         <input value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
-        <label>Role</label>
+        <label>Rol</label>
         <select value={role} onChange={(e) => setRole(e.target.value as UserRole)} style={{ width: '100%', marginBottom: 10, padding: 10 }}>
-          <option value="ADMINISTRATOR">Administrator</option>
-          <option value="DOCTOR">Doctor</option>
-          <option value="NURSE">Nurse</option>
-          <option value="SECRETARY">Secretary</option>
-          <option value="RECEPTIONIST">Receptionist</option>
-          <option value="LAB_TECHNICIAN">Lab Technician</option>
+          <option value="ADMINISTRATOR">Administrador</option>
+          <option value="DOCTOR">Médico</option>
+          <option value="NURSE">Enfermero/a</option>
+          <option value="SECRETARY">Secretario/a</option>
+          <option value="RECEPTIONIST">Recepcionista</option>
+          <option value="LAB_TECHNICIAN">Técnico de Laboratorio</option>
         </select>
-        <label>Password</label>
+        <label>Contraseña</label>
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
-        <label>Confirm password</label>
+        <label>Confirmar contraseña</label>
         <input type="password" value={confirm_password} onChange={(e) => setConfirmPassword(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
         {error && <div style={{ color: '#b91c1c', marginBottom: 10 }}>{error}</div>}
         <button disabled={submitting} style={{ width: '100%', padding: 10, background: '#0d9488', color: '#fff', border: 0, borderRadius: 8 }}>
-          {submitting ? 'Creating...' : 'Create account'}
+          {submitting ? 'Creando...' : 'Crear cuenta'}
         </button>
         <p style={{ marginTop: 10 }}>
-          Have an account? <Link to="/login">Login</Link>
+          ¿Tiene una cuenta? <Link to="/login">Inicio de Sesión</Link>
         </p>
       </form>
     </div>

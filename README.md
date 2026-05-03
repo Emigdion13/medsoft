@@ -1,6 +1,8 @@
 # Medisoft
 
-A medical practice management application with a Django backend and React frontend.
+Una aplicación de gestión médica (Spanish) con Django backend y React frontend.
+
+**Note**: This project is fully in Spanish. All UI text, labels, and documentation are in Spanish.
 
 ## Quick Start
 
@@ -22,7 +24,7 @@ Default credentials: `admin` / `admin`
 
 ```bash
 # 1. Start database (PostgreSQL 15 must be running locally)
-# 2. Start backend
+# 2. Start backend (Python 3.12 required)
 cd backend
 source venv/bin/activate  # or use your preferred venv
 python manage.py migrate
@@ -79,6 +81,10 @@ npx playwright test
 | `VITE_BACKEND_URL` | `http://localhost:8000/api` | `http://backend:8000/api` | Proxy target |
 | `DJANGO_SETTINGS_MODULE` | default | `config.settings_docker` | Django settings module |
 | `DJANGO_ADMIN_PASSWORD` | `admin` | `admin` | Default admin password |
+
+## Python Version
+
+The backend requires **Python 3.12**. Use a `.python-version` file in the `backend/` directory for consistent version management with tools like `pyenv`.
 
 ## E2E Testing with Playwright
 

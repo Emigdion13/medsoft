@@ -18,15 +18,15 @@ export default function Sidebar() {
       <h2 style={{ marginTop: 0 }}>MediSoft</h2>
       <div style={{ opacity: 0.8, marginBottom: 12 }}>{user?.first_name} {user?.last_name}</div>
 
-      <NavLink to="/dashboard" style={linkStyle}>Dashboard</NavLink>
+      <NavLink to="/dashboard" style={linkStyle}>Panel Principal</NavLink>
 
-      {can(user, 'view', 'appointments') && <NavLink to="/appointments" style={linkStyle}>Appointments</NavLink>}
-      {can(user, 'view', 'patients') && <NavLink to="/patients" style={linkStyle}>Patients</NavLink>}
-      {can(user, 'view', 'medical_records') && <NavLink to="/medical-records" style={linkStyle}>Medical Records</NavLink>}
-      {can(user, 'view', 'users') && <NavLink to="/admin/users" style={linkStyle}>User Management</NavLink>}
+      {can(user, 'view', 'appointments') && <NavLink to="/appointments" style={linkStyle}>Citas</NavLink>}
+      {can(user, 'view', 'patients') && <NavLink to="/patients" style={linkStyle}>Pacientes</NavLink>}
+      {can(user, 'view', 'medical_records') && <NavLink to="/medical-records" style={linkStyle}>Historias Médicas</NavLink>}
+      {can(user, 'view', 'users') && <NavLink to="/admin/users" style={linkStyle}>Gestión de Usuarios</NavLink>}
 
       <button onClick={logout} style={{ marginTop: 16, width: '100%', padding: '10px 12px', borderRadius: 8, border: 0, background: '#ef4444', color: '#fff' }}>
-        Logout
+        Cerrar sesión
       </button>
     </aside>
   )

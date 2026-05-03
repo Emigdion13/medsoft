@@ -46,12 +46,18 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: medisoft-frontend
     ports:
-      - "3000:80"
+      - "5173:5173"
+    env_file:
+      - .env.docker
     environment:
-      - VITE_API_URL=http://medisoft-backend:8000/api
+      - VITE_API_URL=/api
+      - VITE_BACKEND_URL=http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       backend:
         condition: service_healthy
@@ -68,7 +74,7 @@ services:
       - ./test/e2e:/app
       - ./frontend:/app/frontend
     environment:
-      - TEST_BASE_URL=http://medisoft-frontend:80
+      - TEST_BASE_URL=http://medisoft-frontend:5173
       - TEST_BACKEND_URL=http://medisoft-backend:8000
       - PLAYWRIGHT_HTML_REPORT=test-results/html
     depends_on:

@@ -39,6 +39,9 @@ RUN sed -i 's/for field, _ in index\.fields_orders/for field in getattr(index, "
 # Copy application code
 COPY . .
 
+# Install pytest for testing (as root before switching to appuser)
+RUN pip install --no-cache-dir pytest-django==4.9.0
+
 # Expose port
 EXPOSE 8000
 
