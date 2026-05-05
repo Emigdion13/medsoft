@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from utils.constants import (
@@ -86,6 +87,29 @@ class Appointment(models.Model):
                 fields=['deleted_at'], name='appt_deleted_at_idx'
             ),
         ]
+
+    def clean(self) -> None:
+        """Validate that appointment doesn't overlap with existing appointments for the same doctor."""
+        super().clean()
+
+        if not self.start_at or not self.end_at:
+            return
+
+        # Find overlapping appointments for the same doctor (excluding self if updating)
+        overlapping = Appointment.objects.filter(
+            doctor=self.doctor,
+            status__in=['PROGRAMADA', 'CONFIRMADA', 'EN_CURSO'],
+            start_at__lt=self.end_at,
+            end_at__gt=self.start_at,
+        )
+        if self.pk:
+            overlapping = overlapping.exclude(pk=self.pk)
+
+        if overlapping.exists():
+            raise ValidationError({
+                'start_at': 'El médico ya tiene una cita en este horario',
+                'end_at': 'El médico ya tiene una cita en este horario',
+            })
 
     def __str__(self):
         return f'{self.doctor} — {self.start_at}'

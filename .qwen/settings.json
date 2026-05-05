@@ -87,7 +87,21 @@
       "Bash(which *)",
       "Bash(setsid *)",
       "Bash(python3 *)",
-      "Bash(python3.12 *)"
+      "Bash(python3.12 *)",
+      "Bash(python3.10 *)",
+      "Bash(python3.9 *)",
+      "Bash(python3.11 *)",
+      "Bash(/users/emi/desktop/projects/medisoft/backend/venv/bin/python *)",
+      "Bash(brew *)",
+      "Bash(/opt/homebrew/bin/python3.14 *)",
+      "Bash(/users/emi/desktop/projects/medisoft/backend/venv/bin/pip *)",
+      "Bash(/opt/homebrew/bin/python3.10 *)",
+      "Bash(/opt/homebrew/opt/postgresql@14/bin/createuser *)",
+      "Bash(createdb *)",
+      "Bash(npm *)",
+      "Bash(od *)",
+      "Bash(git checkout *)",
+      "Bash(tzutil *)"
     ]
   },
   "$version": 3

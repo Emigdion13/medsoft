@@ -74,7 +74,11 @@ export const appointmentsService = {
 
   cancel(id: string) {
     return api.patch<Appointment>(`/appointments/${id}/`, {
-      status: 'CANCELLED',
+      status: 'CANCELADA',
     })
+  },
+
+  delete(id: string) {
+    return api.delete<Appointment>(`/appointments/${id}/`)
   },
 }

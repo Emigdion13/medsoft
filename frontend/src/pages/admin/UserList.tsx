@@ -23,7 +23,7 @@ export function UserList({ onSelectEdit }: UserListProps) {
       setUsers(res?.results ?? [])
     } catch (err) {
       console.error('Error loading users:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load users')
+      setError(err instanceof Error ? err.message : 'Error al cargar usuarios')
     } finally {
       setLoading(false)
     }
@@ -35,17 +35,17 @@ export function UserList({ onSelectEdit }: UserListProps) {
 
   if (loading && users.length === 0) {
     return (
-      <PageContainer title="Users">
-        <div>Loading...</div>
+      <PageContainer title="Usuarios">
+        <div>Cargando...</div>
       </PageContainer>
     )
   }
 
   if (error) {
     return (
-      <PageContainer title="Users">
+      <PageContainer title="Usuarios">
         <div style={{ color: 'red' }}>Error: {error}</div>
-        <button onClick={() => void load()}>Retry</button>
+        <button onClick={() => void load()}>Reintentar</button>
       </PageContainer>
     )
   }
@@ -53,26 +53,26 @@ export function UserList({ onSelectEdit }: UserListProps) {
   // Safety check - if users is still undefined or null
   if (!users || !Array.isArray(users)) {
     return (
-      <PageContainer title="Users">
-        <div style={{ color: 'red' }}>Invalid data received</div>
+      <PageContainer title="Usuarios">
+        <div style={{ color: 'red' }}>Datos inválidos recibidos</div>
       </PageContainer>
     )
   }
 
   return (
-    <PageContainer title="Users">
+    <PageContainer title="Usuarios">
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search" style={{ padding: 10, minWidth: 240 }} />
-        <button onClick={() => void load()} style={{ padding: '10px 12px' }}>Search</button>
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar" style={{ padding: 10, minWidth: 240 }} />
+        <button onClick={() => void load()} style={{ padding: '10px 12px' }}>Buscar</button>
       </div>
       <table style={{ width: '100%', background: '#fff', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left', padding: 8 }}>Name</th>
+            <th style={{ textAlign: 'left', padding: 8 }}>Nombre</th>
             <th style={{ textAlign: 'left', padding: 8 }}>Email</th>
-            <th style={{ textAlign: 'left', padding: 8 }}>Role</th>
-            <th style={{ textAlign: 'left', padding: 8 }}>Status</th>
-            <th style={{ textAlign: 'left', padding: 8 }}>Actions</th>
+            <th style={{ textAlign: 'left', padding: 8 }}>Rol</th>
+            <th style={{ textAlign: 'left', padding: 8 }}>Estado</th>
+            <th style={{ textAlign: 'left', padding: 8 }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -81,9 +81,9 @@ export function UserList({ onSelectEdit }: UserListProps) {
               <td style={{ padding: 8 }}>{u.first_name} {u.last_name}</td>
               <td style={{ padding: 8 }}>{u.email}</td>
               <td style={{ padding: 8 }}>{u.role}</td>
-              <td style={{ padding: 8 }}>{u.is_active ? 'Active' : 'Inactive'}</td>
+              <td style={{ padding: 8 }}>{u.is_active ? 'Activo' : 'Inactivo'}</td>
               <td style={{ padding: 8 }}>
-                <button onClick={() => onSelectEdit(u)} style={{ padding: '6px 10px' }}>Edit</button>
+                <button onClick={() => onSelectEdit(u)} style={{ padding: '6px 10px' }}>Editar</button>
               </td>
             </tr>
           ))}

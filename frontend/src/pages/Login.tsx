@@ -18,7 +18,7 @@ export default function Login() {
       await login({ username, password })
       navigate('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+      setError(err instanceof Error ? err.message : 'Error de inicio de sesión')
     } finally {
       setSubmitting(false)
     }
@@ -27,14 +27,14 @@ export default function Login() {
   return (
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
       <form onSubmit={onSubmit} style={{ width: 380, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 20 }}>
-        <h2 style={{ marginTop: 0 }}>Login</h2>
-        <label htmlFor="username">Username</label>
+        <h2 style={{ marginTop: 0 }}>Inicio de Sesión</h2>
+        <label htmlFor="username">Nombre de usuario</label>
         <input id="username" value={username} onChange={(e) => setUsername(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">Contraseña</label>
         <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%', marginBottom: 10, padding: 10 }} />
         {error && <div style={{ color: '#b91c1c', marginBottom: 10 }}>{error}</div>}
         <button disabled={submitting} style={{ width: '100%', padding: 10, background: '#2563eb', color: '#fff', border: 0, borderRadius: 8 }}>
-          {submitting ? 'Signing in...' : 'Sign in'}
+          {submitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </button>
       </form>
     </div>

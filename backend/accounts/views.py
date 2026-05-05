@@ -2,6 +2,7 @@ from typing import Any
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -162,12 +163,19 @@ class SpecialtyViewSet(viewsets.ModelViewSet):
 
 # ── Doctor ViewSet ────────────────────────────────────────────────────
 
+class DoctorPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
 class DoctorViewSet(viewsets.ModelViewSet):
     """CRUD operations for doctors."""
 
     queryset = Doctor.objects.filter(is_active=True, deleted_at__isnull=True)
     serializer_class = DoctorSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = DoctorPagination
 
     def get_queryset(self) -> Any:
         """Filter by organization and optionally search."""
@@ -197,12 +205,19 @@ class DoctorViewSet(viewsets.ModelViewSet):
 
 # ── Patient ViewSet ───────────────────────────────────────────────────
 
+class PatientPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
 class PatientViewSet(viewsets.ModelViewSet):
     """CRUD operations for patients."""
 
     queryset = Patient.objects.filter(deleted_at__isnull=True)
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = PatientPagination
 
     def get_queryset(self) -> Any:
         """Filter by organization and optionally search."""
@@ -232,6 +247,12 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 # ── Appointment ViewSet ───────────────────────────────────────────────
 
+class AppointmentPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
 class AppointmentViewSet(viewsets.ModelViewSet):
     """CRUD operations for appointments."""
 
@@ -240,6 +261,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     ).order_by('-start_at')
     serializer_class = AppointmentSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = AppointmentPagination
 
     def get_queryset(self) -> Any:
         """Filter by organization and optionally by date."""
@@ -265,5 +287,5 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer: AppointmentSerializer) -> None:
-        """Set organization from the requesting user."""
-        serializer.save(organization=self.request.user.organization)
+        """Let the serializer handle organization and created_by assignment."""
+        serializer.save()

@@ -50,7 +50,7 @@ export default function AdminUsersPage() {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 12 }}>
       <UserList onSelectEdit={onSelectEdit} />
-      <UserForm value={form} onChange={setForm} onSubmit={() => void onSubmit()} submitLabel={editing ? 'Update user' : 'Create user'} />
+      <UserForm value={form} onChange={setForm} onSubmit={() => void onSubmit()} submitLabel={editing ? 'Actualizar usuario' : 'Crear usuario'} />
     </div>
   )
 }

@@ -1,3 +1,5 @@
+
+from django.utils import timezone
 from rest_framework import serializers
 
 from apps.core.users.models import User
@@ -5,6 +7,25 @@ from apps.core.organizations.models import Organization
 from apps.doctors.models import Specialty, Doctor
 from apps.patients.models import Patient
 from apps.appointments.models import Appointment
+
+
+class TimeZoneDateTimeField(serializers.DateTimeField):
+    """DateTimeField that treats naive datetimes as America/Santo_Domingo timezone."""
+    
+    def to_internal_value(self, value):
+        """Convert incoming value to datetime, treating naive datetimes as DR time."""
+        if value is None:
+            return value
+        
+        # Let the parent handle parsing
+        dt = super().to_internal_value(value)
+        
+        # If datetime is naive (no timezone), assume it's in America/Santo_Domingo
+        if dt is not None and dt.tzinfo is None:
+            dr_tz = timezone.get_fixed_timezone(-240)  # America/Santo_Domingo is UTC-4
+            dt = timezone.make_aware(dt, dr_tz)
+        
+        return dt
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -58,21 +79,21 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs: dict) -> dict:
         """Validate password confirmation matches and uniqueness."""
         if attrs['password'] != attrs['confirm_password']:
-            raise serializers.ValidationError({'confirm_password': 'Passwords do not match'})
-        
+            raise serializers.ValidationError({'confirm_password': 'Las contraseñas no coinciden'})
+
         # Get the organization for uniqueness checks
         org = Organization.objects.first()
         if not org:
-            raise serializers.ValidationError({'organization': 'No organization found. Please contact support.'})
-        
+            raise serializers.ValidationError({'organization': 'No se encontró una organización. Por favor, contacte al soporte.'})
+
         # Check for existing user with same username in this organization
         if User.objects.filter(organization=org, username=attrs['username']).exists():
-            raise serializers.ValidationError({'username': 'A user with this username already exists in this organization'})
-        
-        # Check for existing user with same email in this organization  
+            raise serializers.ValidationError({'username': 'Ya existe un usuario con este nombre de usuario en esta organización'})
+
+        # Check for existing user with same email in this organization
         if User.objects.filter(organization=org, email=attrs['email'].lower()).exists():
-            raise serializers.ValidationError({'email': 'A user with this email already exists in this organization'})
-        
+            raise serializers.ValidationError({'email': 'Ya existe un usuario con este correo electrónico en esta organización'})
+
         return attrs
 
     def create(self, validated_data: dict) -> User:
@@ -80,7 +101,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Get the first organization (there should be one from initial setup)
         org = Organization.objects.first()
         if not org:
-            raise serializers.ValidationError({'organization': 'No organization found. Please contact support.'})
+            raise serializers.ValidationError({'organization': 'No se encontró una organización. Por favor, contacte al soporte.'})
         
         user = User.objects.create_user(
             username=validated_data['username'],
@@ -207,6 +228,10 @@ class AppointmentSerializer(serializers.ModelSerializer):
     doctor_id = serializers.UUIDField(write_only=True)
     patient = PatientSerializer(read_only=True)
     patient_id = serializers.UUIDField(write_only=True)
+    
+    # Use custom field that treats naive datetimes as America/Santo_Domingo
+    start_at = TimeZoneDateTimeField()
+    end_at = TimeZoneDateTimeField()
 
     class Meta:
         model = Appointment
@@ -221,16 +246,62 @@ class AppointmentSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs: dict) -> dict:
-        """Validate that end_at > start_at."""
+        """Validate that end_at > start_at and check for appointment overlaps."""
         if attrs.get('end_at') and attrs.get('start_at') and attrs['end_at'] <= attrs['start_at']:
-            raise serializers.ValidationError({'end_at': 'End time must be after start time'})
-        return attrs
+            raise serializers.ValidationError({'end_at': 'La hora de finalización debe ser posterior a la de inicio'})
+
+        # Check for overlapping appointments on the same doctor
+        request = self.context.get('request')
+        
+        # Get doctor_id - from attrs (for new appointments) or existing instance
+        doctor_id = attrs.get('doctor_id') or getattr(self.instance, 'doctor_id', None)
+        start_at = attrs.get('start_at')
+        end_at = attrs.get('end_at')
+
+        if doctor_id and start_at and end_at:
+            # Check for overlaps with any user in context (or without authentication)
+            overlapping = Appointment.objects.filter(
+                doctor_id=doctor_id,
+                status__in=['PROGRAMADA', 'CONFIRMADA', 'EN_CURSO'],
+                start_at__lt=end_at,
+                end_at__gt=start_at,
+            )
+            if self.instance:
+                overlapping = overlapping.exclude(pk=self.instance.pk)
+
+            if overlapping.exists():
+                raise serializers.ValidationError({
+                    'start_at': 'El médico ya tiene una cita en este horario',
+                    'end_at': 'El médico ya tiene una cita en este horario',
+                })
+
+        # Call parent validate to ensure field validators run
+        return super().validate(attrs)
 
     def create(self, validated_data: dict) -> Appointment:
-        """Set created_by from authenticated user."""
-        validated_data.pop('doctor_id')
-        validated_data.pop('patient_id')
-        request = self.context['request']
+        """Set organization and created_by from authenticated user."""
+        # Extract foreign key IDs before they're used
+        doctor_id = validated_data.pop('doctor_id', None)
+        patient_id = validated_data.pop('patient_id', None)
+
+        request = self.context.get('request')
+
+        # Set organization from the requesting user's default organization
         if request and hasattr(request, 'user'):
-            validated_data['created_by'] = request.user
+            user_org = getattr(request.user, 'default_organization', None)
+            if user_org:
+                validated_data['organization'] = user_org
+            else:
+                # Fallback: get first org if user has no default
+                from apps.core.organizations.models import Organization
+                org = Organization.objects.first()
+                if org:
+                    validated_data['organization'] = org
+
+        # Now set the actual foreign key objects/IDs for the parent create to use
+        if doctor_id:
+            validated_data['doctor_id'] = doctor_id
+        if patient_id:
+            validated_data['patient_id'] = patient_id
+
         return super().create(validated_data)

@@ -140,8 +140,8 @@ export interface Patient {
 
 // ── Appointment ───────────────────────────────────────────────────────
 
-export type AppointmentType = 'PRESCRIPTION' | 'CONSULTATION' | 'EMERGENCY' | 'LAB' | 'VACCINE' | 'OTHER'
-export type AppointmentStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW'
+export type AppointmentType = 'CONSULTA' | 'CONTROL' | 'EMERGENCIA' | 'SEGUIMIENTO'
+export type AppointmentStatus = 'PROGRAMADA' | 'CONFIRMADA' | 'EN_CURSO' | 'COMPLETADA' | 'CANCELADA' | 'NO_ASISTIO'
 
 export interface Appointment {
   id: string

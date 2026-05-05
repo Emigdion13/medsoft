@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       host: '0.0.0.0',
+      allowedHosts: ['.medisoft-frontend'],
       proxy: {
         '/api': {
           target: env.VITE_BACKEND_URL || 'http://localhost:8000',
