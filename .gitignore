@@ -2,6 +2,9 @@
 .env
 .venv
 
+# Qwen Code settings
+.qwen/settings.json
+
 # Generated files
 venv/
 __pycache__/
