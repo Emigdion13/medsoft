@@ -24,21 +24,25 @@ class TestAppointmentOverlapValidation:
     @pytest.fixture
     def org(self):
         """Create a test organization."""
-        return Organization.objects.create(
+        return Organization.objects.get_or_create(
             name="Test Organization",
-            phone="+1234567890",
-            email="test@example.com",
-            address="123 Test St"
-        )
+            defaults={
+                "phone": "+1234567890",
+                "email": "test@example.com",
+                "address": "123 Test St"
+            }
+        )[0]
 
     @pytest.fixture
     def specialty(self):
         """Create a specialty for doctors."""
-        return Specialty.objects.create(
+        return Specialty.objects.get_or_create(
             code="GEN",
-            name="General Practice",
-            description="General medical practice"
-        )
+            defaults={
+                "name": "General Practice",
+                "description": "General medical practice"
+            }
+        )[0]
 
     @pytest.fixture
     def doctor(self, org, specialty):

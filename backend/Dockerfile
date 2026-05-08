@@ -45,9 +45,12 @@ RUN pip install --no-cache-dir pytest-django==4.9.0
 # Expose port
 EXPOSE 8000
 
-# Startup script - copy and set executable before switching to non-root user
-COPY startup.sh /startup.sh
-RUN chmod +x /startup.sh
+# Startup script - copy, convert line endings, and set executable before switching to non-root user
+COPY startup.sh /startup.sh.tmp
+RUN sed -i 's/\r$//' /startup.sh.tmp && \
+    sed -i '1s|^#!.*|#!/bin/sh|' /startup.sh.tmp && \
+    mv /startup.sh.tmp /startup.sh && \
+    chmod +x /startup.sh
 
 USER appuser
 

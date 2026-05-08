@@ -40,3 +40,6 @@ LICENSE
 
 # Build artifacts
 *.log
+
+# Explicitly include startup script
+!startup.sh

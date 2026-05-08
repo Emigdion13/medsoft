@@ -101,7 +101,15 @@
       "Bash(npm *)",
       "Bash(od *)",
       "Bash(git checkout *)",
-      "Bash(tzutil *)"
+      "Bash(tzutil *)",
+      "Bash(write-host)",
+      "Bash(file *)",
+      "Bash(git config *)",
+      "Bash(dockerd *)",
+      "Bash(start *)",
+      "Bash(do *)",
+      "Bash(@echo *)",
+      "Bash(npx *)"
     ]
   },
   "$version": 3

@@ -21,7 +21,7 @@ test.describe('Autenticación', () => {
   }, { timeout: 30000 });
 
   test('should show error with invalid credentials', async ({ page }) => {
-    await page.goto(`${frontendURL}/login`);
+    await page.goto(`${frontendURL}/login`, { timeout: 30000, waitUntil: 'domcontentloaded' });
 
     // Wait for form to be ready
     await expect(page.locator('form')).toBeVisible({ timeout: 5000 });

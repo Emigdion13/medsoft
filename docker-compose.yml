@@ -11,7 +11,7 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings_docker
       - DATABASE_URL=postgresql://medisoft:medisoft@db:5432/medisoft
-      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-me}
+      - SECRET_KEY=${DJANGO_SECRET_KEY:-django-insecure-change-me}
       - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend,medisoft-frontend,medisoft-backend
       - DJANGO_ADMIN_PASSWORD=admin
     depends_on:
