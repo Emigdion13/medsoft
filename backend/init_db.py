@@ -16,6 +16,18 @@ def _get_tz():
 
 def init():
     import django
+
+    # Set settings module explicitly (strip whitespace from .env files)
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings_docker".strip())
+    if not os.environ.get("DATABASE_URL"):
+        # Fallback: build DATABASE_URL from individual env vars
+        db_parts = {k.strip(): v.strip() for k, v in os.environ.items() if k.startswith("DB_")}
+        if all(k in db_parts for k in ("DB_NAME", "DB_USER", "DB_HOST")):
+            os.environ["DATABASE_URL"] = (
+                f"postgresql://{db_parts['DB_USER']}:{db_parts.get('DB_PASSWORD', '')}"
+                f"@{db_parts['DB_HOST']}:{db_parts.get('DB_PORT', '5432')}/{db_parts['DB_NAME']}"
+            )
+
     django.setup()
 
     from apps.core.organizations.models import Organization

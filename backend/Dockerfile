@@ -33,9 +33,6 @@ RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
-# Patch Django's _check_indexes to handle both Index and UniqueConstraint
-RUN sed -i 's/for field, _ in index\.fields_orders/for field in getattr(index, "fields", getattr(index, "fields_orders", []))/' /usr/local/lib/python3.12/site-packages/django/db/models/base.py
-
 # Copy application code
 COPY . .
 

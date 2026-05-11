@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const API_BASE = process.env.TEST_BACKEND_URL?.replace(/\/$/, '') + '/api' || 'http://localhost:8000/api';
+const API_BASE = (process.env.TEST_BACKEND_URL ? process.env.TEST_BACKEND_URL.replace(/\/$/, '') : 'http://localhost:8000') + '/api';
 
 test.describe('Appointments Navigation', () => {
   test('should navigate to appointments from Dashboard "Today Appointments" card', async ({ page }) => {
@@ -195,8 +195,6 @@ test.describe('Appointments CRUD', () => {
       return;
     }
 
-    console.log('Using token from localStorage (first 50 chars):', token.substring(0, 50));
-
     // Get doctor and patient using the token from localStorage
     const doctorsRes = await page.request.get(`${API_BASE}/doctors/`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -210,11 +208,14 @@ test.describe('Appointments CRUD', () => {
     const patientsData = await patientsRes.json();
     const patient = Array.isArray(patientsData) ? patientsData[0] : patientsData?.results?.[0];
 
-    test.skip(!doctor || !patient, 'Need at least one doctor and one patient to test');
+    if (!doctor || !patient) {
+      test.skip(true, 'Need at least one doctor and one patient to test');
+      return;
+    }
 
     // Create an appointment via API with a unique reason to identify it
     const cancelReason = `Cancel test ${Date.now()}`;
-    let createdAppt = null;
+    let createdAppt: any = null;
 
     // Try multiple time slots to avoid conflicts with existing appointments
     for (let attempt = 0; attempt < 5; attempt++) {
@@ -222,9 +223,8 @@ test.describe('Appointments CRUD', () => {
       apiStart.setHours(16, Math.floor(Math.random() * 480), 0, 0); // random minute in next 8 hours
       const apiEnd = new Date(apiStart.getTime() + 3600000);
 
-      const url = `${API_BASE}/appointments/`;
-      console.log(`Creating appointment attempt ${attempt + 1} at URL:`, url);
-      const createRes = await page.request.post(url, {
+      console.log(`Creating appointment attempt ${attempt + 1} at:`, apiStart.toISOString());
+      const createRes = await page.request.post(`${API_BASE}/appointments/`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -235,11 +235,9 @@ test.describe('Appointments CRUD', () => {
           start_at: apiStart.toISOString(),
           end_at: apiEnd.toISOString(),
           reason: cancelReason,
-          type: 'SEGUIMIENTO',
+          appointment_type: 'SEGUIMIENTO',
         },
       });
-
-      console.log(`Response status attempt ${attempt + 1}:`, createRes.status());
 
       if (createRes.ok()) {
         createdAppt = await createRes.json();
@@ -251,87 +249,43 @@ test.describe('Appointments CRUD', () => {
       }
     }
 
-    test.skip(!createdAppt, 'Could not create appointment after 5 attempts (schedule conflicts)');
+    if (!createdAppt) {
+      test.skip(true, 'Could not create appointment after 5 attempts (schedule conflicts)');
+      return;
+    }
 
-    // Refresh the page to see the new appointment
+    // Reload to see the new appointment in the table
     await page.reload({ waitUntil: 'networkidle' });
 
-    // Verify the table has at least one row with an Edit button
+    // Wait for at least one row with an action button to appear
     const editButtons = page.getByRole('button', { name: 'Editar' });
     await expect(editButtons.first()).toBeVisible({ timeout: 10000 });
 
-    // Click the first Edit button to open the form
-    await editButtons.first().click();
-    await expect(page.getByRole('heading', { name: 'Editar Cita' })).toBeVisible({ timeout: 5000 });
+    // Click the "Cancelar" button on the first row (the appointment we just created)
+    const cancelButton = page.getByRole('button', { name: 'Cancelar' }).first();
+    await expect(cancelButton).toBeVisible({ timeout: 5000 });
 
-    // Wait for form fields to load, then change status to CANCELADA
-    // Try multiple selectors since the label association may vary
-    const statusSelect = page.locator('select#status, select[name="status"], #appointment-status').first();
-    const statusByLabel = page.getByLabel('Estado');
-    let usedApiFallback = false;
+    // Intercept the window.confirm dialog and accept it
+    page.on('dialog', async (dialog) => {
+      test.assertEqual(dialog.type(), 'confirm');
+      await dialog.accept();
+    });
 
-    // Use whichever selector finds the element first
-    if (await statusSelect.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await statusSelect.selectOption({ label: 'Cancelada' });
-    } else if (await statusByLabel.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await statusByLabel.selectOption({ label: 'Cancelada' });
-    } else {
-      // Fallback: cancel via API directly
-      usedApiFallback = true;
-      console.log('Could not find status select in form, using API-based cancel');
-      const cancelRes = await page.request.patch(`${API_BASE}/appointments/${createdAppt.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { status: 'CANCELADA' },
-      });
-      console.log(`API cancel response: ${cancelRes.status()}: ${await cancelRes.text()}`);
+    await cancelButton.click();
 
-      // Close the form
-      await page.getByRole('button', { name: /cancelar|cerrar/i }).first().click();
-      await page.waitForTimeout(500);
+    // The frontend optimistically updates status to CANCELADA, so the Cancel button should disappear
+    await expect(cancelButton).not.toBeVisible({ timeout: 5000 });
 
-      // Verify via API
-      const verifyRes = await page.request.get(`${API_BASE}/appointments/${createdAppt.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (verifyRes.ok()) {
-        const data = await verifyRes.json();
-        test.skip(data.status !== 'CANCELADA', `Appointment status is ${data.status}, expected CANCELADA`);
-      }
-    }
+    // Verify via API that the appointment was actually cancelled
+    const verifyRes = await page.request.get(`${API_BASE}/appointments/${createdAppt.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(verifyRes.ok()).toBeTruthy();
+    const apptData = await verifyRes.json();
+    expect(apptData.status).toBe('CANCELADA');
 
-    if (!usedApiFallback) {
-      // Save the changes
-      await page.getByRole('button', { name: /guardar/i }).click();
-
-      // Wait for form to close (success) or check for error
-      const formClosed = await page.locator('form').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => false);
-
-      if (!formClosed) {
-        await page.screenshot({ path: 'test-results/cancel-form-still-open.png' });
-        // Form didn't close - might be a validation error, try API-based cancel as fallback
-        const cancelRes = await page.request.patch(`${API_BASE}/appointments/${createdAppt.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-          data: { status: 'CANCELADA' },
-        });
-        console.log(`API cancel status: ${cancelRes.status()}: ${await cancelRes.text()}`);
-
-        // Close the form and refresh
-        await page.getByRole('button', { name: /cancelar|cerrar/i }).first().click();
-        await page.reload({ waitUntil: 'networkidle' });
-
-        // Verify via API that status was updated
-        const verifyRes = await page.request.get(`${API_BASE}/appointments/${createdAppt.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (verifyRes.ok()) {
-          const data = await verifyRes.json();
-          test.skip(data.status !== 'CANCELADA', `Appointment status is ${data.status}, expected CANCELADA`);
-        }
-      } else {
-        // Form closed successfully - verify CANCELADA appears in the table
-        await expect(page.getByText('CANCELADA')).toBeVisible({ timeout: 10000 });
-      }
-    }
+    // Also verify CANCELADA text appears in the table row for this appointment
+    await expect(page.getByText('CANCELADA')).toBeVisible({ timeout: 5000 });
   }, { timeout: 60000 });
 
   test('should display appointment time correctly (timezone roundtrip - America/Santo_Domingo)', async ({ page }) => {

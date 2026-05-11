@@ -32,4 +32,12 @@ class Migration(migrations.Migration):
                 'ordering': ['-created_at'],
             },
         ),
+        migrations.RunSQL(
+            sql=[
+                "ALTER TABLE audit_auditlog ADD CONSTRAINT audit_auditlog_org_fk FOREIGN KEY (organization_id) REFERENCES core_organizations_organization(id)",
+            ],
+            reverse_sql=[
+                "ALTER TABLE audit_auditlog DROP CONSTRAINT IF EXISTS audit_auditlog_org_fk",
+            ],
+        ),
     ]

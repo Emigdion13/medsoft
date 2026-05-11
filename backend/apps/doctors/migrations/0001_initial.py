@@ -54,6 +54,14 @@ class Migration(migrations.Migration):
                 'ordering': ['id'],
             },
         ),
+        migrations.RunSQL(
+            sql=[
+                "ALTER TABLE doctors_doctor ADD CONSTRAINT doctors_doctor_org_fk FOREIGN KEY (organization_id) REFERENCES core_organizations_organization(id)",
+            ],
+            reverse_sql=[
+                "ALTER TABLE doctors_doctor DROP CONSTRAINT IF EXISTS doctors_doctor_org_fk",
+            ],
+        ),
         migrations.CreateModel(
             name='DoctorSpecialty',
             fields=[

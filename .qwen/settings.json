@@ -109,8 +109,10 @@
       "Bash(start *)",
       "Bash(do *)",
       "Bash(@echo *)",
-      "Bash(npx *)"
+      "Bash(npx *)",
+      "Bash(netstat *)",
+      "Bash(select-object *)"
     ]
   },
-  "$version": 3
+  "$version": 4
 }

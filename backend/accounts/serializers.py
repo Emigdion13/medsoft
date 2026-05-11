@@ -1,4 +1,5 @@
 
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -250,26 +251,39 @@ class AppointmentSerializer(serializers.ModelSerializer):
         if attrs.get('end_at') and attrs.get('start_at') and attrs['end_at'] <= attrs['start_at']:
             raise serializers.ValidationError({'end_at': 'La hora de finalización debe ser posterior a la de inicio'})
 
-        # Check for overlapping appointments on the same doctor
+        # Check for overlapping appointments on the same doctor (within user's organization)
         request = self.context.get('request')
-        
+
         # Get doctor_id - from attrs (for new appointments) or existing instance
         doctor_id = attrs.get('doctor_id') or getattr(self.instance, 'doctor_id', None)
         start_at = attrs.get('start_at')
         end_at = attrs.get('end_at')
 
         if doctor_id and start_at and end_at:
-            # Check for overlaps with any user in context (or without authentication)
-            overlapping = Appointment.objects.filter(
+            # Determine the organization to scope overlaps by
+            user_org = None
+            if request and hasattr(request, 'user'):
+                user_org = getattr(request.user, 'default_organization', None) or \
+                           getattr(request.user, 'organization', None)
+
+            overlap_qs = Appointment.objects.filter(
                 doctor_id=doctor_id,
                 status__in=['PROGRAMADA', 'CONFIRMADA', 'EN_CURSO'],
                 start_at__lt=end_at,
                 end_at__gt=start_at,
             )
-            if self.instance:
-                overlapping = overlapping.exclude(pk=self.instance.pk)
+            # Scope overlaps to the user's organization
+            if user_org:
+                overlap_qs = overlap_qs.filter(
+                    Q(doctor__organization=user_org) |
+                    Q(patient__organization=user_org) |
+                    Q(organization=user_org)
+                )
 
-            if overlapping.exists():
+            if self.instance:
+                overlap_qs = overlap_qs.exclude(pk=self.instance.pk)
+
+            if overlap_qs.exists():
                 raise serializers.ValidationError({
                     'start_at': 'El médico ya tiene una cita en este horario',
                     'end_at': 'El médico ya tiene una cita en este horario',

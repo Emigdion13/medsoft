@@ -22,13 +22,28 @@ while ! pg_isready -h ${DB_HOST:-localhost} -p ${DB_PORT:-5432} -U ${DB_USER:-po
 done
 echo "PostgreSQL is ready!"
 
-# Apply migrations (use --fake-initial if database is empty)
-echo "Running migrations..."
-python manage.py migrate --noinput --fake-initial || python manage.py migrate --noinput
+# Apply migrations (no --fake-initial for fresh databases)
+# echo "Running migrations..."
+# python manage.py migrate --noinput
 
-# Create default organization and admin user via Python script (CRLF-safe)
-echo "Initializing database defaults..."
-python init_db.py
+# DEBUG: Check migration graph before applying
+echo "Checking migration graph..."
+python << 'PYEOF'
+import os, django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings_docker')
+django.setup()
+from django.db.migrations.loader import MigrationLoader
+loader = MigrationLoader(None)
+print('\n=== Migration Graph Dependencies ===')
+for key in sorted(loader.graph.nodes.keys()):
+    node = loader.graph.node_map[key]
+    if key[0] not in ['contenttypes', 'auth']:
+        print(f'{key}: parents={len(node.parents)}, children={len(node.children)}')
+PYEOF
+
+# Apply migrations (no --fake-initial for fresh databases)
+echo "Running migrations..."
+python manage.py migrate --noinput
 
 # Collect static files if needed
 echo "Collecting static files..."

@@ -29,6 +29,14 @@ class Migration(migrations.Migration):
                 'indexes': [models.Index(fields=['organization'], name='role_org_idx'), models.Index(fields=['is_active'], name='role_is_active_idx')],
             },
         ),
+        migrations.RunSQL(
+            sql=[
+                "ALTER TABLE core_roles_role ADD CONSTRAINT core_roles_role_org_fk FOREIGN KEY (organization_id) REFERENCES core_organizations_organization(id)",
+            ],
+            reverse_sql=[
+                "ALTER TABLE core_roles_role DROP CONSTRAINT IF EXISTS core_roles_role_org_fk",
+            ],
+        ),
         migrations.AddConstraint(
             model_name='role',
             constraint=models.UniqueConstraint(fields=('organization', 'code'), name='role_org_code_unique'),

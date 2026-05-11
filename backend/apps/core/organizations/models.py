@@ -1,8 +1,12 @@
+import uuid
+
 from django.db import models
 
 
 class Organization(models.Model):
     """Datos de la clínica (1 registro en v1)."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     name = models.CharField(max_length=160)
     trade_name = models.CharField(max_length=160, blank=True, null=True)

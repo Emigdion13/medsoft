@@ -30,8 +30,16 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='appointment',
-            name='organization',
-            field=models.ForeignKey(db_column='organization_id', on_delete=django.db.models.deletion.PROTECT, to='core_organizations.organization'),
+            name='organization_id',
+            field=models.UUIDField(db_column='organization_id'),
+        ),
+        migrations.RunSQL(
+            sql=[
+                "ALTER TABLE appointments_appointment ADD CONSTRAINT appointments_appointment_org_fk FOREIGN KEY (organization_id) REFERENCES core_organizations_organization(id)",
+            ],
+            reverse_sql=[
+                "ALTER TABLE appointments_appointment DROP CONSTRAINT IF EXISTS appointments_appointment_org_fk",
+            ],
         ),
         migrations.AddField(
             model_name='appointment',

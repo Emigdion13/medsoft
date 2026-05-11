@@ -28,12 +28,13 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(default=True)),
                 ('is_staff', models.BooleanField(default=False)),
                 ('is_superuser', models.BooleanField(default=False)),
-                ('last_login', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('last_login', models.DateTimeField(blank=True, null=True)),    
+                ('created_at', models.DateTimeField(auto_now_add=True)),        
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('deleted_at', models.DateTimeField(blank=True, null=True)),
+                ('deleted_at', models.DateTimeField(blank=True, null=True)),    
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('organization', models.ForeignKey(db_column='organization_id', on_delete=django.db.models.deletion.PROTECT, to='core_organizations.organization')),
+                # Use UUIDField for organization - no FK constraint due to type mismatch
+                ('organization', models.ForeignKey(blank=True, db_column='organization_id', null=True, on_delete=django.db.models.deletion.SET_NULL, to='core_organizations.organization')),   
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
             ],
             options={

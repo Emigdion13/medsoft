@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.db.models import Q
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
@@ -269,16 +270,18 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
         user = self.request.user
         if hasattr(user, 'organization') and user.organization:
+            org = user.organization
+            # Filter appointments belonging to the user's organization
+            # (appointment itself, or via doctor/patient)
             qs = qs.filter(
-                doctor__organization=user.organization
-            ) | qs.filter(
-                patient__organization=user.organization
+                Q(organization=org) |
+                Q(doctor__organization=org) |
+                Q(patient__organization=org)
             )
 
         # Filter by date range if provided
         date_param = self.request.query_params.get('date')
         if date_param:
-            from django.db.models import Q
             qs = qs.filter(
                 Q(start_at__date=date_param)
                 | Q(end_at__date=date_param)

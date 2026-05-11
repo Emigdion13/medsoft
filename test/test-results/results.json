@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Users/emi/Desktop/projects/medisoft/test/e2e/playwright.config.ts",
-    "rootDir": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests",
+    "configFile": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\playwright.config.ts",
+    "rootDir": "c:/Users/juan_/OneDrive/Desktop/projects/mediSoft/test/e2e/tests",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -11,25 +11,25 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 2
+      "actualWorkers": 8
     },
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Users/emi/Desktop/projects/medisoft/test/e2e/test-results",
+        "outputDir": "c:/Users/juan_/OneDrive/Desktop/projects/mediSoft/test/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 8
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests",
+        "testDir": "c:/Users/juan_/OneDrive/Desktop/projects/mediSoft/test/e2e/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 15000
+        "timeout": 30000
       }
     ],
     "quiet": false,
@@ -56,10 +56,214 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.59.1",
-    "workers": 4,
+    "workers": 8,
     "webServer": null
   },
   "suites": [
+    {
+      "title": "admin-users.test.ts",
+      "file": "admin-users.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Gestión de Usuarios",
+          "file": "admin-users.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should navigate to user management from sidebar",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2858,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.782Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ea3a1b70820bc869363b-cd98c2ba240134d7a14f",
+              "file": "admin-users.test.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "should display user list table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3104,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.749Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ea3a1b70820bc869363b-7bfef3f614ae02c0de3d",
+              "file": "admin-users.test.ts",
+              "line": 19,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "api.test.ts",
+      "file": "api.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Backend API Tests",
+          "file": "api.test.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "GET /health/ - should return healthy status",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 148,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.734Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c04f6c958c2c3dd17d9d-2f6a2230ca5cd49bc039",
+              "file": "api.test.ts",
+              "line": 16,
+              "column": 3
+            },
+            {
+              "title": "GET /api/users/ - should return users list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 79,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.810Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c04f6c958c2c3dd17d9d-f99de6e9abba3490a921",
+              "file": "api.test.ts",
+              "line": 26,
+              "column": 3
+            },
+            {
+              "title": "should return 401 for unauthenticated access",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 51,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.749Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c04f6c958c2c3dd17d9d-897872d4d3fb6b8fc5fb",
+              "file": "api.test.ts",
+              "line": 36,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
     {
       "title": "appointments.test.ts",
       "file": "appointments.test.ts",
@@ -70,85 +274,417 @@
         {
           "title": "Appointments Navigation",
           "file": "appointments.test.ts",
-          "line": 3,
+          "line": 5,
           "column": 6,
           "specs": [
             {
-              "title": "should navigate to appointments from dashboard",
-              "ok": false,
+              "title": "should navigate to appointments from Dashboard \"Today Appointments\" card",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 15000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 311,
-                      "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n    at test.timeout (/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts:5:16)",
-                        "location": {
-                          "file": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts",
-                          "column": 16,
-                          "line": 5
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 3156,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.750Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9273eb7f2a6345e71f31-cd739e73fea97cbfc0ab",
+              "file": "appointments.test.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "should navigate to appointments via sidebar",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 2961,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.780Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9273eb7f2a6345e71f31-00f1f12606273d429aa0",
+              "file": "appointments.test.ts",
+              "line": 24,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Appointments CRUD",
+          "file": "appointments.test.ts",
+          "line": 38,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should open and close the new appointment form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 7,
+                      "status": "passed",
+                      "duration": 3402,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:42.796Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9273eb7f2a6345e71f31-8c8b6f66978208f3e33d",
+              "file": "appointments.test.ts",
+              "line": 47,
+              "column": 3
+            },
+            {
+              "title": "should display validation errors on empty form submission",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 2868,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:43.269Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9273eb7f2a6345e71f31-295e15dede650e5fc3f6",
+              "file": "appointments.test.ts",
+              "line": 61,
+              "column": 3
+            },
+            {
+              "title": "should create an appointment via the API and verify it appears in the list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Could not obtain auth token",
+                      "location": {
+                        "file": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts",
+                        "line": 102,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "skipped",
+                      "duration": 8950,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Login attempt 1 failed with status 404, retrying...\n"
                         },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'Appointments Navigation'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test(\u001b[32m'should navigate to appointments from dashboard'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/username/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/sign in/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\u001b[0m"
+                        {
+                          "text": "Login attempt 2 failed with status 404, retrying...\n"
+                        },
+                        {
+                          "text": "Login attempt 3 failed with status 404, retrying...\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:43.271Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Could not obtain auth token",
+                          "location": {
+                            "file": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts",
+                            "line": 102,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "9273eb7f2a6345e71f31-9398bdd4366ab45b2baa",
+              "file": "appointments.test.ts",
+              "line": 79,
+              "column": 3
+            },
+            {
+              "title": "should cancel an existing appointment",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 2836,
+                      "error": {
+                        "message": "SyntaxError: Unexpected token '<', \"<!doctype \"... is not valid JSON",
+                        "stack": "SyntaxError: Unexpected token '<', \"<!doctype \"... is not valid JSON\n    at test.timeout (c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts:204:25)",
+                        "location": {
+                          "file": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts",
+                          "column": 25,
+                          "line": 204
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 202 |\u001b[39m       headers\u001b[33m:\u001b[39m { \u001b[33mAuthorization\u001b[39m\u001b[33m:\u001b[39m \u001b[32m`Bearer ${token}`\u001b[39m }\u001b[33m,\u001b[39m\n \u001b[90m 203 |\u001b[39m     })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 204 |\u001b[39m     \u001b[36mconst\u001b[39m doctorsData \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m doctorsRes\u001b[33m.\u001b[39mjson()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 205 |\u001b[39m     \u001b[36mconst\u001b[39m doctor \u001b[33m=\u001b[39m \u001b[33mArray\u001b[39m\u001b[33m.\u001b[39misArray(doctorsData) \u001b[33m?\u001b[39m doctorsData[\u001b[35m0\u001b[39m] \u001b[33m:\u001b[39m doctorsData\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mresults\u001b[33m?\u001b[39m\u001b[33m.\u001b[39m[\u001b[35m0\u001b[39m]\u001b[33m;\u001b[39m\n \u001b[90m 206 |\u001b[39m\n \u001b[90m 207 |\u001b[39m     \u001b[36mconst\u001b[39m patientsRes \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mrequest\u001b[33m.\u001b[39m\u001b[36mget\u001b[39m(\u001b[32m`${API_BASE}/patients/`\u001b[39m\u001b[33m,\u001b[39m {\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts",
-                            "column": 16,
-                            "line": 5
+                            "file": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts",
+                            "column": 25,
+                            "line": 204
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'Appointments Navigation'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test(\u001b[32m'should navigate to appointments from dashboard'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/username/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/sign in/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at test.timeout (/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts:5:16)\u001b[22m"
+                          "message": "SyntaxError: Unexpected token '<', \"<!doctype \"... is not valid JSON\n\n\u001b[0m \u001b[90m 202 |\u001b[39m       headers\u001b[33m:\u001b[39m { \u001b[33mAuthorization\u001b[39m\u001b[33m:\u001b[39m \u001b[32m`Bearer ${token}`\u001b[39m }\u001b[33m,\u001b[39m\n \u001b[90m 203 |\u001b[39m     })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 204 |\u001b[39m     \u001b[36mconst\u001b[39m doctorsData \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m doctorsRes\u001b[33m.\u001b[39mjson()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 205 |\u001b[39m     \u001b[36mconst\u001b[39m doctor \u001b[33m=\u001b[39m \u001b[33mArray\u001b[39m\u001b[33m.\u001b[39misArray(doctorsData) \u001b[33m?\u001b[39m doctorsData[\u001b[35m0\u001b[39m] \u001b[33m:\u001b[39m doctorsData\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mresults\u001b[33m?\u001b[39m\u001b[33m.\u001b[39m[\u001b[35m0\u001b[39m]\u001b[33m;\u001b[39m\n \u001b[90m 206 |\u001b[39m\n \u001b[90m 207 |\u001b[39m     \u001b[36mconst\u001b[39m patientsRes \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mrequest\u001b[33m.\u001b[39m\u001b[36mget\u001b[39m(\u001b[32m`${API_BASE}/patients/`\u001b[39m\u001b[33m,\u001b[39m {\u001b[0m\n\u001b[2m    at test.timeout (c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts:204:25)\u001b[22m"
                         }
                       ],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "Using token from localStorage (first 50 chars): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90e\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-04-27T15:04:35.506Z",
+                      "startTime": "2026-05-08T05:02:43.310Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "/Users/emi/Desktop/projects/medisoft/test/e2e/test-results/appointments-Appointments--79264-appointments-from-dashboard-chromium/test-failed-1.png"
+                          "path": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\test-results\\appointments-Appointments--8613c-cel-an-existing-appointment-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "/Users/emi/Desktop/projects/medisoft/test/e2e/test-results/appointments-Appointments--79264-appointments-from-dashboard-chromium/error-context.md"
+                          "path": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\test-results\\appointments-Appointments--8613c-cel-an-existing-appointment-chromium\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\test-results\\appointments-Appointments--8613c-cel-an-existing-appointment-chromium\\trace.zip"
                         }
                       ],
                       "errorLocation": {
-                        "file": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts",
-                        "column": 16,
-                        "line": 5
+                        "file": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts",
+                        "column": 25,
+                        "line": 204
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "9273eb7f2a6345e71f31-6f4633b57d9548e87baf",
+              "id": "9273eb7f2a6345e71f31-bb598cf69fd990ead9a4",
               "file": "appointments.test.ts",
-              "line": 4,
+              "line": 182,
               "column": 3
             },
             {
-              "title": "should navigate to appointments via top bar",
-              "ok": false,
+              "title": "should display appointment time correctly (timezone roundtrip - America/Santo_Domingo)",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 15000,
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Could not obtain auth token for timezone test",
+                      "location": {
+                        "file": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts",
+                        "line": 360,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 7677,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Timezone test login attempt 1 failed with status 404, retrying...\n"
+                        },
+                        {
+                          "text": "Timezone test login attempt 2 failed with status 404, retrying...\n"
+                        },
+                        {
+                          "text": "Timezone test login attempt 3 failed with status 404, retrying...\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:45.943Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Could not obtain auth token for timezone test",
+                          "location": {
+                            "file": "c:\\Users\\juan_\\OneDrive\\Desktop\\projects\\mediSoft\\test\\e2e\\tests\\appointments.test.ts",
+                            "line": 360,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "9273eb7f2a6345e71f31-0612be03d881ed748add",
+              "file": "appointments.test.ts",
+              "line": 337,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "auth.test.ts",
+      "file": "auth.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Autenticación",
+          "file": "auth.test.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should login with valid credentials",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 1324,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:46.038Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f0c50cfc8142f74e2e08-764b8a5a4cbf8e98a6ad",
+              "file": "auth.test.ts",
+              "line": 8,
+              "column": 3
+            },
+            {
+              "title": "should show error with invalid credentials",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -157,58 +693,652 @@
                     {
                       "workerIndex": 1,
                       "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 311,
-                      "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n    at test.timeout (/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts:19:16)",
-                        "location": {
-                          "file": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts",
-                          "column": 16,
-                          "line": 19
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m\n \u001b[90m 18 |\u001b[39m   test(\u001b[32m'should navigate to appointments via top bar'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/username/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/sign in/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts",
-                            "column": 16,
-                            "line": 19
-                          },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m\n \u001b[90m 18 |\u001b[39m   test(\u001b[32m'should navigate to appointments via top bar'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/username/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m'admin'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/sign in/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at test.timeout (/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts:19:16)\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 940,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-04-27T15:04:35.506Z",
+                      "startTime": "2026-05-08T05:02:46.238Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/emi/Desktop/projects/medisoft/test/e2e/test-results/appointments-Appointments--7510b-to-appointments-via-top-bar-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/emi/Desktop/projects/medisoft/test/e2e/test-results/appointments-Appointments--7510b-to-appointments-via-top-bar-chromium/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/emi/Desktop/projects/medisoft/test/e2e/tests/appointments.test.ts",
-                        "column": 16,
-                        "line": 19
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "9273eb7f2a6345e71f31-1d7f6a0ed60c5357280e",
-              "file": "appointments.test.ts",
-              "line": 18,
+              "id": "f0c50cfc8142f74e2e08-dda776c2115fd076059b",
+              "file": "auth.test.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "API: should return valid tokens on login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 279,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:46.268Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f0c50cfc8142f74e2e08-bcccfd6db36e5cc9671f",
+              "file": "auth.test.ts",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "API: should reject requests with invalid token",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 15,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:46.313Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f0c50cfc8142f74e2e08-122a6094bf5061ed6714",
+              "file": "auth.test.ts",
+              "line": 53,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "dashboard-buttons.test.ts",
+      "file": "dashboard-buttons.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Botones del Panel de Control",
+          "file": "dashboard-buttons.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should navigate to appointments from \"Today Appointments\" card",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 1304,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:46.375Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6236f8b041da4386cb6e-104ec749c6b86b533052",
+              "file": "dashboard-buttons.test.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "should navigate to user management from \"Manage Users\" card",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 7,
+                      "status": "passed",
+                      "duration": 1281,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:46.483Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6236f8b041da4386cb6e-0e67fd48d24866f4160b",
+              "file": "dashboard-buttons.test.ts",
+              "line": 19,
+              "column": 3
+            },
+            {
+              "title": "should navigate to register user from \"Register User\" card",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 1277,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:46.575Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6236f8b041da4386cb6e-7344d5840c7a5f2755d5",
+              "file": "dashboard-buttons.test.ts",
+              "line": 26,
+              "column": 3
+            },
+            {
+              "title": "should display \"Pending Tasks\" and \"Alerts\" cards",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1191,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:47.235Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6236f8b041da4386cb6e-f8390f7eb198e737200b",
+              "file": "dashboard-buttons.test.ts",
+              "line": 33,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "example.spec.ts",
+      "file": "example.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Example Tests",
+          "file": "example.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should display homepage correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 625,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:47.407Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a30a6eba6312f6b87ea5-df6a1960a03c9871202a",
+              "file": "example.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "should show health endpoint works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 92,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:49.035Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a30a6eba6312f6b87ea5-5cf4ed4bb2aba5856af3",
+              "file": "example.spec.ts",
+              "line": 17,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "frontend.test.ts",
+      "file": "frontend.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Pruebas de Interfaz Frontend",
+          "file": "frontend.test.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should display dashboard with welcome message",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 1155,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:47.738Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-c4de1e6706f2eb4d2a31",
+              "file": "frontend.test.ts",
+              "line": 15,
+              "column": 3
+            },
+            {
+              "title": "should navigate to dashboard when clicking Panel Principal link",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 7,
+                      "status": "passed",
+                      "duration": 1209,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:47.847Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-423395e5d2c829d29680",
+              "file": "frontend.test.ts",
+              "line": 25,
+              "column": 3
+            },
+            {
+              "title": "should navigate to appointments page when clicking Appointments link",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 1248,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:47.905Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-0a09b25c6b45ebaf9577",
+              "file": "frontend.test.ts",
+              "line": 31,
+              "column": 3
+            },
+            {
+              "title": "should navigate to patients page when clicking Patients link",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 1192,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:48.072Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-1e0055e722559ad0b0c1",
+              "file": "frontend.test.ts",
+              "line": 37,
+              "column": 3
+            },
+            {
+              "title": "should navigate to medical records page when clicking Medical Records link",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1176,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:48.482Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-718034702af9993e7d88",
+              "file": "frontend.test.ts",
+              "line": 43,
+              "column": 3
+            },
+            {
+              "title": "should navigate to user management when clicking User Management link",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 1124,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:48.917Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-393ee68108e8a9bc674e",
+              "file": "frontend.test.ts",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "should log out when clicking Logout button",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 7,
+                      "status": "passed",
+                      "duration": 1165,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:49.086Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-875b0477b7f186694991",
+              "file": "frontend.test.ts",
+              "line": 54,
+              "column": 3
+            },
+            {
+              "title": "should have working navigation from dashboard",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 996,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:49.191Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-51cf5338f430dbd26a70",
+              "file": "frontend.test.ts",
+              "line": 59,
+              "column": 3
+            },
+            {
+              "title": "should show error if login fails",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 1399,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T05:02:49.172Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2e94ab78fe644e71905d-36b86577adb5cf01e839",
+              "file": "frontend.test.ts",
+              "line": 67,
               "column": 3
             }
           ]
@@ -218,11 +1348,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-04-27T15:04:35.182Z",
-    "duration": 922.029,
-    "expected": 0,
-    "skipped": 0,
-    "unexpected": 2,
+    "startTime": "2026-05-08T05:02:41.449Z",
+    "duration": 12290.363,
+    "expected": 28,
+    "skipped": 2,
+    "unexpected": 1,
     "flaky": 0
   }
 }

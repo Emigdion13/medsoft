@@ -46,6 +46,14 @@ class Migration(migrations.Migration):
                 'ordering': ['start_at'],
             },
         ),
+        migrations.RunSQL(
+            sql=[
+                "ALTER TABLE encounters_encounter ADD CONSTRAINT encounters_encounter_org_fk FOREIGN KEY (organization_id) REFERENCES core_organizations_organization(id)",
+            ],
+            reverse_sql=[
+                "ALTER TABLE encounters_encounter DROP CONSTRAINT IF EXISTS encounters_encounter_org_fk",
+            ],
+        ),
         migrations.CreateModel(
             name='VitalSign',
             fields=[
