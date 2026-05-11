@@ -16,7 +16,7 @@ class UserManager(BaseUserManager):
         first_name: str,
         last_name: str,
         password: str | None = None,
-        organization_id: uuid.UUID | None = None,
+        organization_id: int | None = None,
     ) -> 'User':
         """Create a regular user with hashed password."""
         if not password:
@@ -40,7 +40,7 @@ class UserManager(BaseUserManager):
         first_name: str,
         last_name: str,
         password: str | None = None,
-        organization_id: uuid.UUID | None = None,
+        organization_id: int | None = None,
     ) -> 'User':
         """Create a superuser with hashed password."""
         user = self.create_user(
@@ -62,7 +62,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     """Identidad de usuarios del sistema (auth)."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization_id = models.UUIDField(null=True, blank=True)
+    organization = models.ForeignKey(
+        'core_organizations.Organization',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='organization_id'
+    )
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=255)
     first_name = models.CharField(max_length=100)
@@ -102,23 +108,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def email_lower(self) -> str:
         return self.email.lower()
 
-    @property
-    def organization(self):
-        """Property to access organization via organization_id."""
-        if hasattr(self, '_organization'):
-            return self._organization
-        from apps.core.organizations.models import Organization
-        try:
-            return Organization.objects.get(id=self.organization_id) if self.organization_id else None
-        except Organization.DoesNotExist:
-            return None
-
-    @organization.setter
-    def organization(self, value):
-        """Setter to set organization by assigning an Organization instance."""
-        self._organization = value
-        self.organization_id = value.id if value else None
-
     def check_password(self, raw_password: str) -> bool:
         """Check if the password matches the stored hash."""
         return check_password(raw_password, self.password)
@@ -131,12 +120,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         ordering = ['id']
         constraints = [
             models.UniqueConstraint(
-                fields=['organization_id', 'username'],
+                fields=['organization', 'username'],
                 condition=models.Q(deleted_at__isnull=True),
                 name='user_org_username_unique',
             ),
             models.UniqueConstraint(
-                fields=['organization_id', 'email'],
+                fields=['organization', 'email'],
                 condition=models.Q(deleted_at__isnull=True),
                 name='user_org_email_unique',
             ),

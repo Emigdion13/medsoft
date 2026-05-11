@@ -111,7 +111,17 @@
       "Bash(@echo *)",
       "Bash(npx *)",
       "Bash(netstat *)",
-      "Bash(select-object *)"
+      "Bash(select-object *)",
+      "Bash(open *)",
+      "Bash(-- *)",
+      "Bash('\nfrom information_schema.table_constraints as tc\njoin information_schema.key_column_usage as kcu on tc.constraint_name = kcu.constraint_name\nwhere tc.constraint_type = 'foreign *)",
+      "Bash(alter *)",
+      "Bash(update *)",
+      "Bash(lpad)",
+      "Bash(::uuid)",
+      "Bash(id)",
+      "Bash(pkill *)",
+      "Bash(git *)"
     ]
   },
   "$version": 4

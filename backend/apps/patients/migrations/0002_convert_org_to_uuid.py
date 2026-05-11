@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             sql="""
                 ALTER TABLE patients_patient 
                 ALTER COLUMN organization_id TYPE uuid 
-                USING '00000000-0000-0000-0000-' || lpad(organization_id::text, 12, '0')::uuid;
+                USING ('00000000-0000-0000-0000-' || lpad(organization_id::text, 12, '0'))::uuid;
             """,
             reverse_sql="""
                 ALTER TABLE patients_patient 

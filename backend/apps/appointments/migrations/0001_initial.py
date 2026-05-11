@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 ('reason', models.TextField(blank=True, null=True)),
                 ('status', models.CharField(choices=[('PROGRAMADA', 'Programada'), ('CONFIRMADA', 'Confirmada'), ('EN_CURSO', 'En curso'), ('COMPLETADA', 'Completada'), ('CANCELADA', 'Cancelada'), ('NO_ASISTIO', 'No asistió')], default='PROGRAMADA', max_length=20)),
                 ('notes', models.TextField(blank=True, null=True)),
+                ('organization', models.ForeignKey(db_column='organization_id', on_delete=models.PROTECT, to='core_organizations.organization')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('deleted_at', models.DateTimeField(blank=True, null=True)),
