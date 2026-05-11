@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql="""
                 UPDATE core_organizations_organization 
-                SET id_new = '00000000-0000-0000-0000-' || lpad(id::text, 12, '0')::uuid;
+                SET id_new = ('00000000-0000-0000-0000-' || lpad(id::text, 12, '0'))::uuid;
             """,
             reverse_sql=migrations.RunSQL.noop,
         ),
