@@ -64,6 +64,7 @@ class ClinicalNote(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -89,6 +90,9 @@ class ClinicalNote(models.Model):
             ),
             models.Index(
                 fields=['status'], name='note_status_idx'
+            ),
+            models.Index(
+                fields=['deleted_at'], name='note_deleted_at_idx'
             ),
         ]
 
@@ -125,6 +129,7 @@ class Diagnosis(models.Model):
     recorded_at = models.DateTimeField(
         db_column='recorded_at', auto_now_add=True
     )
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-recorded_at']
@@ -147,6 +152,9 @@ class Diagnosis(models.Model):
             ),
             models.Index(
                 fields=['status'], name='diag_status_idx'
+            ),
+            models.Index(
+                fields=['deleted_at'], name='diag_deleted_at_idx'
             ),
         ]
 
@@ -187,6 +195,7 @@ class Prescription(models.Model):
     prescribed_at = models.DateTimeField(
         db_column='prescribed_at', auto_now_add=True
     )
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-prescribed_at']
@@ -209,6 +218,9 @@ class Prescription(models.Model):
             ),
             models.Index(
                 fields=['status'], name='rx_status_idx'
+            ),
+            models.Index(
+                fields=['deleted_at'], name='rx_deleted_at_idx'
             ),
         ]
 

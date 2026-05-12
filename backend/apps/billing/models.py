@@ -25,9 +25,15 @@ class ServiceCode(models.Model):
         max_length=60, blank=True, null=True
     )
     is_active = models.BooleanField(default=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['id']
+        indexes = [
+            models.Index(
+                fields=['deleted_at'], name='service_deleted_at_idx'
+            ),
+        ]
 
     def __str__(self):
         return f'{self.code} — {self.name}'
@@ -65,6 +71,8 @@ class EncounterBilling(models.Model):
     billed_at = models.DateTimeField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['id']
@@ -81,6 +89,9 @@ class EncounterBilling(models.Model):
             ),
             models.Index(
                 fields=['billing_status'], name='billing_status_idx'
+            ),
+            models.Index(
+                fields=['deleted_at'], name='billing_deleted_at_idx'
             ),
         ]
 

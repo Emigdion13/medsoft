@@ -15,12 +15,22 @@ import type {
 
 type FormErrors = Record<string, string>
 
-const APPOINTMENT_TYPES: { value: CreateAppointmentPayload['appointment_type']; label: string }[] = [
-  { value: 'CONSULTA', label: 'Consulta General' },
-  { value: 'CONTROL', label: 'Control Médico' },
-  { value: 'EMERGENCIA', label: 'Emergencia' },
-  { value: 'SEGUIMIENTO', label: 'Seguimiento' },
+const APPOINTMENT_TYPES: { value: CreateAppointmentPayload['appointment_type']; label: string; icon: string }[] = [
+  { value: 'CONSULTA', label: 'Consulta General', icon: '🩺' },
+  { value: 'CONTROL', label: 'Control Médico', icon: '📊' },
+  { value: 'EMERGENCIA', label: 'Emergencia', icon: '⚡' },
+  { value: 'SEGUIMIENTO', label: 'Seguimiento', icon: '📅' },
 ]
+
+// Status colors - calm, medical-appropriate palette
+const STATUS_CONFIG = {
+  PROGRAMADA: { color: '#3b82f6', light: '#eff6ff', label: 'Programada' },
+  CONFIRMADA: { color: '#10b981', light: '#ecfdf5', label: 'Confirmada' },
+  EN_CURSO: { color: '#f59e0b', light: '#fef3c7', label: 'En curso' },
+  COMPLETADA: { color: '#10b981', light: '#ecfdf5', label: 'Completada' },
+  CANCELADA: { color: '#ef4444', light: '#fef2f2', label: 'Cancelada' },
+  NO_ASISTIO: { color: '#6b7280', light: '#f3f4f6', label: 'No asistió' },
+}
 
 export default function Appointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -31,6 +41,9 @@ export default function Appointments() {
   const [showForm, setShowForm] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [filterStatus, setFilterStatus] = useState<string>('all')
+  // Error state for API failures
+  const [initError, setInitError] = useState<string | null>(null)
 
   const [form, setForm] = useState<Omit<CreateAppointmentPayload, 'notes'> & { notes: string }>({
     doctor_id: '',
@@ -42,17 +55,30 @@ export default function Appointments() {
     notes: '',
   })
 
+  // Load data on mount
   useEffect(() => {
     Promise.all([
-      appointmentsService.list({ page: 1 }).catch(() => ({ data: { results: [] } })),
-      doctorsService.list({ page: 1, search: '' }).catch(() => ({ data: { results: [] } })),
-      patientsService.list({ page: 1, search: '' }).catch(() => ({ data: { results: [] } })),
-    ]).then(([apptRes, docRes, patRes]) => {
-      setAppointments((apptRes as PaginatedResponse<Appointment>)?.results ?? [])
-      setDoctors((docRes as PaginatedResponse<Doctor>)?.results ?? [])
-      setPatients((patRes as PaginatedResponse<Patient>)?.results ?? [])
-      setLoading(false)
-    })
+      appointmentsService.list({ page: 1 }),
+      doctorsService.list({ page: 1, search: '' }),
+      patientsService.list({ page: 1, search: '' }),
+    ])
+      .then(([apptRes, docRes, patRes]) => {
+        setAppointments(apptRes.results ?? [])
+        setDoctors(docRes.results ?? [])
+        setPatients(patRes.results ?? [])
+        setLoading(false)
+        setInitError(null)
+      })
+      .catch((err) => {
+        console.error('Failed to load initial data:', err)
+        const message = err instanceof Error ? err.message : 'Error al cargar los datos'
+        setInitError(message)
+        // Still set empty arrays so the form can render
+        setAppointments([])
+        setDoctors([])
+        setPatients([])
+        setLoading(false)
+      })
   }, [])
 
   const resetForm = () => {
@@ -67,6 +93,7 @@ export default function Appointments() {
     })
     setErrors({})
     setEditingId(null)
+    setShowForm(false)
   }
 
   const validate = (): boolean => {
@@ -417,6 +444,40 @@ export default function Appointments() {
               }}
             />
           </div>
+
+          {/* Error Banner */}
+          {initError && (
+            <div style={{
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              color: '#991b1b',
+              padding: '12px 16px',
+              borderRadius: 8,
+              marginBottom: 16,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <strong>Error al cargar los datos</strong>
+                <p style={{ margin: '4px 0 0', fontSize: 13 }}>{initError}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setInitError(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#991b1b',
+                  cursor: 'pointer',
+                  fontSize: 20,
+                  padding: '4px 8px'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          )}
 
           {/* Submit */}
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>

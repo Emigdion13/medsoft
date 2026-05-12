@@ -105,6 +105,9 @@ class Encounter(models.Model):
             models.Index(
                 fields=['encounter_type'], name='enc_type_idx'
             ),
+            models.Index(
+                fields=['deleted_at'], name='enc_deleted_at_idx'
+            ),
         ]
 
     def __str__(self):

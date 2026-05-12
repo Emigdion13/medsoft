@@ -506,3 +506,151 @@ const isoWithOffset = `${dtString}${sign}${offsetHours}:${offsetMins}`
 This didn't work because:
 - The backend was running in wrong timezone context (America/Chicago vs America/Santo_Domingo)
 - Playwright tests use system timezone which may differ from app's business timezone
+
+---
+
+## 7. Docker Frontend-Backend Proxy Fix - May 11, 2026
+
+### Problem Description
+
+When running the application in Docker containers, the frontend could not communicate with the backend API. The Vite dev server proxy was failing because:
+
+1. Inside the frontend container, `localhost` refers to the container itself, not the host machine
+2. The proxy configuration was targeting `http://localhost:8000` which doesn't exist inside Docker
+3. Need to use Docker service names (`backend:8000`) for inter-container communication
+
+### Root Cause
+
+Docker networking uses service discovery - containers communicate via service names, not `localhost`. When the frontend container tried to proxy `/api/*` requests to `http://localhost:8000`, it was looking for a server inside its own container (which doesn't exist).
+
+### Solution
+
+**frontend/vite.config.ts**
+
+Updated the proxy configuration to use Docker service URL when running in Docker environment:
+
+```typescript
+const backendUrl = process.env.VITE_BACKEND_URL || 'http://localhost:8000'
+
+proxy: {
+  '/api': {
+    target: backendUrl,
+    changeOrigin: true,
+    // ... other config
+  }
+}
+```
+
+**Environment Variables**
+
+The `.env.docker` file already had the correct setting:
+```bash
+VITE_BACKEND_URL=http://backend:8000
+```
+
+This gets baked into the Docker image via `frontend/Dockerfile.dev`:
+```dockerfile
+ENV VITE_BACKEND_URL=http://backend:8000
+```
+
+### How It Works Now
+
+When accessing the frontend via `http://localhost:5173` in Docker:
+
+1. Browser requests go to the Vite dev server (frontend container)
+2. `/api/*` requests are proxied by Vite to `http://backend:8000/api/*`
+3. Backend processes the request and returns the response
+4. Frontend receives the data seamlessly
+
+### Key Takeaways
+
+1. **Inside Docker, use service names** - `localhost` means "this container", not "host machine"
+2. **Environment-specific URLs** - Use different backend URLs for local dev vs Docker
+3. **Vite proxy is flexible** - Can be configured via environment variables at build time
+4. **Test both modes** - Always verify API works in both local and Docker environments
+
+### Verification Steps
+
+```bash
+# Reset admin password for testing
+docker compose exec backend python manage.py shell -c "from apps.core.users.models import User; from django.contrib.auth.hashers import make_password; user = User.objects.get(username='admin'); user.password = make_password('admin123'); user.save(); print('Password updated')"
+
+# Test login via frontend proxy
+curl http://localhost:5173/api/auth/login/ -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Should return access and refresh tokens
+```
+
+---
+
+## 8. TypeScript Type Mismatch Fix - May 11, 2026
+
+### Problem Description
+
+TypeScript compilation error:
+```
+frontend/src/utils/auth.tsx(37,29): error TS2339: Property 'access' does not exist on type 'User'.
+```
+
+The `refreshSession()` function was calling `authService.me()` and trying to access `.access` and `.refresh` properties that don't exist on the return type.
+
+### Root Cause
+
+**Type mismatch between implementation and interface:**
+
+1. **Interface definition (`types.ts`):**
+   ```typescript
+   export interface AuthService {
+     me(): Promise<User>  // Returns User directly
+   }
+   ```
+
+2. **Implementation (`authService.ts`):**
+   ```typescript
+   async me() {
+     const res = await api.get('/accounts/profile/')
+     return res.data  // Returns raw API response with { access, refresh, user }
+   }
+   ```
+
+3. **Usage in `auth.tsx`:**
+   ```typescript
+   const refreshSession = async () => {
+     const me = await authService.me()  // TypeScript thinks this is User
+     session.setUser(me)
+     setUser(me)
+   }
+   ```
+
+The code was written expecting the old API where `me()` returned `{ access, refresh, user }`, but after refactoring it should return just `User`.
+
+### Solution
+
+**backend/src/services/authService.ts** - Updated to match interface:
+
+```typescript
+async me() {
+  const res = await api.get('/accounts/profile/')
+  // Extract and return only the User object, not the full response
+  return res.data.user as User
+}
+```
+
+This ensures `authService.me()` returns a `User` object directly, matching the `AuthService` interface definition.
+
+### Key Takeaways
+
+1. **Interface contracts matter** - When you define an interface, implementations must match it exactly
+2. **Type safety catches bugs early** - TypeScript would have prevented this mismatch from reaching production
+3. **Refactoring requires updating all layers** - When changing return types, update:
+   - The implementation
+   - All callers of the function
+   - Any type assertions or casts
+
+### How to Verify the Fix
+
+1. Run TypeScript check: `cd frontend && npx tsc --noEmit`
+2. Build the project: `npm run build`
+3. Both should complete without errors
