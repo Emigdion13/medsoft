@@ -73,6 +73,7 @@ class ImagingOrder(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='created_by',
+        related_name='imaging_orders_created',
     )
     updated_by = models.ForeignKey(
         'core_users.User',
@@ -80,6 +81,7 @@ class ImagingOrder(models.Model):
         db_column='updated_by',
         blank=True,
         null=True,
+        related_name='imaging_orders_updated',
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -136,6 +138,7 @@ class ImagingReport(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='technician_user_id',
+        related_name='imaging_reports_technician',
     )
     radiologist_user = models.ForeignKey(
         'core_users.User',
@@ -143,6 +146,7 @@ class ImagingReport(models.Model):
         db_column='radiologist_user_id',
         blank=True,
         null=True,
+        related_name='imaging_reports_radiologist',
     )
 
     performed_at = models.DateTimeField(
@@ -175,7 +179,7 @@ class ImagingReport(models.Model):
                 check=models.Q(
                     models.Q(status='FIRMADA', signed_at__isnull=False)
                     & models.Q(radiologist_user__isnull=False)
-                    | models.Q(status__ne='FIRMADA')
+                    | ~models.Q(status='FIRMADA')
                 ),
                 name='img_report_signed_check',
             ),

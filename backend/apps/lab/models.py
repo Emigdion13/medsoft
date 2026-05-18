@@ -23,20 +23,25 @@ class LabTestCatalog(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return f'{self.code} — {self.name}'
+        return f'{self.code}: {self.name}'
+
+
+# Module-level constants for LabOrder
+LAB_ORDER_PRIORITY_CHOICES = (('NORMAL', 'Normal'), ('URGENTE', 'Urgente'))
+LAB_ORDER_STATUS_CHOICES = (
+    ('PENDIENTE', 'Pendiente'),
+    ('RECOLECTADA', 'Recolectada'),
+    ('EN_PROCESO', 'En proceso'),
+    ('COMPLETADA', 'Completada'),
+    ('CANCELADA', 'Cancelada'),
+)
 
 
 class LabOrder(models.Model):
     """Orden de laboratorio emitida por médico."""
 
-    PRIORITY_CHOICES = (('NORMAL', 'Normal'), ('URGENTE', 'Urgente'))
-    STATUS_CHOICES = (
-        ('PENDIENTE', 'Pendiente'),
-        ('RECOLECTADA', 'Recolectada'),
-        ('EN_PROCESO', 'En proceso'),
-        ('COMPLETADA', 'Completada'),
-        ('CANCELADA', 'Cancelada'),
-    )
+    PRIORITY_CHOICES = LAB_ORDER_PRIORITY_CHOICES
+    STATUS_CHOICES = LAB_ORDER_STATUS_CHOICES
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     organization = models.ForeignKey(
@@ -77,6 +82,7 @@ class LabOrder(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='created_by',
+        related_name='lab_orders_created',
     )
     updated_by = models.ForeignKey(
         'core_users.User',
@@ -84,6 +90,7 @@ class LabOrder(models.Model):
         db_column='updated_by',
         blank=True,
         null=True,
+        related_name='lab_orders_updated',
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -99,11 +106,11 @@ class LabOrder(models.Model):
                 name='lab_order_org_number_unique',
             ),
             models.CheckConstraint(
-                check=models.Q(priority__in=[c[0] for c in PRIORITY_CHOICES]),
+                check=models.Q(priority__in=[c[0] for c in LAB_ORDER_PRIORITY_CHOICES]),
                 name='lab_order_priority_check',
             ),
             models.CheckConstraint(
-                check=models.Q(status__in=[c[0] for c in STATUS_CHOICES]),
+                check=models.Q(status__in=[c[0] for c in LAB_ORDER_STATUS_CHOICES]),
                 name='lab_order_status_check',
             ),
         ]
@@ -189,6 +196,7 @@ class LabResult(models.Model):
         'core_users.User',
         on_delete=models.PROTECT,
         db_column='processed_by',
+        related_name='lab_results_processed',
     )
     reviewed_by = models.ForeignKey(
         'core_users.User',
@@ -196,6 +204,7 @@ class LabResult(models.Model):
         db_column='reviewed_by',
         blank=True,
         null=True,
+        related_name='lab_results_reviewed',
     )
 
     processed_at = models.DateTimeField(

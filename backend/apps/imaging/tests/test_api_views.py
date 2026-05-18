@@ -8,11 +8,11 @@ from apps.imaging.models import (
     ImagingReport,
     ImagingFile,
 )
-from apps.core_organizations.tests.factories import OrganizationFactory
+from apps.core.organizations.tests.factories import OrganizationFactory
 from apps.encounters.tests.factories import EncounterFactory
 from apps.patients.tests.factories import PatientFactory
 from apps.doctors.tests.factories import DoctorFactory
-from apps.core_users.tests.factories import UserFactory
+from apps.core.users.tests.factories import UserFactory
 
 
 @pytest.mark.django_db

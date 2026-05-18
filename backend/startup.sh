@@ -41,9 +41,20 @@ for key in sorted(loader.graph.nodes.keys()):
         print(f'{key}: parents={len(node.parents)}, children={len(node.children)}')
 PYEOF
 
+# Create fresh migrations if none exist (first run or fresh clone)
+MIGRATION_COUNT=$(find /app -path "*/migrations/0*.py" 2>/dev/null | wc -l)
+if [ "$MIGRATION_COUNT" -eq 0 ]; then
+    echo "No migrations found — generating from current models..."
+    python manage.py makemigrations --noinput
+fi
+
 # Apply migrations (no --fake-initial for fresh databases)
 echo "Running migrations..."
 python manage.py migrate --noinput
+
+# Seed the database with initial data (admin user, organization, etc.)
+echo "Seeding database..."
+python init_db.py
 
 # Collect static files if needed
 echo "Collecting static files..."

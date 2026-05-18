@@ -1,0 +1,9 @@
+[pytest]
+DJANGO_SETTINGS_MODULE = config.settings_docker
+python_files = test*.py *_test.py tests/**/*.py
+testpaths = accounts appointments apps core doctors patients clinical encounters lab imaging medical_records personnel utils
+addopts = -v --tb=short --ds=config.settings_docker --no-migrations
+django_find_project = true
+django_db_use_migrations = false
+django_db_create = true
+django_db_modify_db_settings = xdist_style

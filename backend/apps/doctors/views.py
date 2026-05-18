@@ -2,6 +2,7 @@ from typing import Any
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -10,7 +11,7 @@ from .models import Doctor, Specialty
 from .serializers import DoctorSerializer, SpecialtySerializer
 
 
-class DoctorPagination:
+class DoctorPagination(PageNumberPagination):
     page_size = 50
     page_size_query_param = 'page_size'
     max_page_size = 500

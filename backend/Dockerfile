@@ -37,7 +37,9 @@ COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY . .
 
 # Install pytest for testing (as root before switching to appuser)
-RUN pip install --no-cache-dir pytest-django==4.9.0
+RUN pip install --no-cache-dir pytest-django==4.9.0 && \
+    chown -R appuser:appgroup /app && \
+    chmod -R 755 /app/apps/*/migrations/
 
 # Expose port
 EXPOSE 8000

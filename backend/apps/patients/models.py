@@ -92,10 +92,11 @@ class Patient(models.Model):
                 check=models.Q(status__in=['ACTIVO', 'INACTIVO', 'FALLECIDO']),
                 name='patient_status_check',
             ),
-            models.CheckConstraint(
-                check=models.Q(birth_date__lte=TruncDate(models.functions.Now())),
-                name='patient_birth_date_past_check',
-            ),
+            # Temporarily disabled for SQLite compatibility
+            # models.CheckConstraint(
+            #     check=models.Q(birth_date__lte=TruncDate(models.functions.Now())),
+            #     name='patient_birth_date_past_check',
+            # ),
             models.UniqueConstraint(
                 fields=['organization', 'cedula'],
                 name='patient_org_cedula_unique',
