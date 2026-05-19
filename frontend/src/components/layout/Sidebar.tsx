@@ -22,7 +22,7 @@ export default function Sidebar() {
 
       {can(user, 'view', 'appointments') && <NavLink to="/citas" style={linkStyle}>Citas</NavLink>}
       {can(user, 'view', 'patients') && <NavLink to="/pacientes" style={linkStyle}>Pacientes</NavLink>}
-      {can(user, 'view', 'medical_records') && <NavLink to="/medical-records" style={linkStyle}>Historias Médicas</NavLink>}
+      {can(user, 'view', 'medical_records') && <NavLink to="/historial-medico" style={linkStyle}>Historial Médico</NavLink>}
       {can(user, 'view', 'users') && <NavLink to="/admin/users" style={linkStyle}>Gestión de Usuarios</NavLink>}
 
       <button onClick={logout} style={{ marginTop: 16, width: '100%', padding: '10px 12px', borderRadius: 8, border: 0, background: '#ef4444', color: '#fff' }}>

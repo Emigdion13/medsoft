@@ -47,7 +47,7 @@ test.describe('Autenticación', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBeTruthy();
+    expect(data.results).toBeDefined();
   }, { timeout: 30000 });
 
   test('API: should reject requests with invalid token', async () => {

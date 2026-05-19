@@ -41,9 +41,9 @@ test.describe('Pruebas de Interfaz Frontend', () => {
   }, { timeout: 30000 });
 
   test('should navigate to medical records page when clicking Medical Records link', async ({ page }) => {
-    await page.getByRole('link', { name: 'Historias Médicas' }).click();
-    await expect(page).toHaveURL(/\/medical-records$/, { timeout: 5000 });
-    await expect(page.getByRole('heading', { name: 'Historias Médicas' })).toBeVisible({ timeout: 5000 });
+    await page.getByRole('link', { name: 'Historial Médico' }).click();
+    await expect(page).toHaveURL(/\/historial-medico$/, { timeout: 5000 });
+    await expect(page.getByRole('heading', { name: 'Historial Médico' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 
   test('should navigate to user management when clicking User Management link', async ({ page }) => {

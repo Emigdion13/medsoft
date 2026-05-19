@@ -68,7 +68,7 @@ export default function App() {
       />
 
       <Route
-        path="/medical-records"
+        path="/historial-medico"
         element={
           <ProtectedLayout>
             <CanAccessRoute module="medical_records">

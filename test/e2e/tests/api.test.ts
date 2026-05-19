@@ -30,7 +30,7 @@ test.describe('Backend API Tests', () => {
 
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
-    expect(Array.isArray(data)).toBeTruthy();
+    expect(data.results).toBeDefined();
   }, { timeout: 30000 });
 
   test('should return 401 for unauthenticated access', async () => {
