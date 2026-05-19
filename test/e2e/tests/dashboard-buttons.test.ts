@@ -12,7 +12,7 @@ test.describe('Botones del Panel de Control', () => {
 
   test('should navigate to appointments from "Today Appointments" card', async ({ page }) => {
     await page.getByRole('link', { name: 'Citas de Hoy' }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 5000 });
     await expect(page.getByRole('heading', { name: 'Citas' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 

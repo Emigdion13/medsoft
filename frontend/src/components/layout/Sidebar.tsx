@@ -20,8 +20,8 @@ export default function Sidebar() {
 
       <NavLink to="/dashboard" style={linkStyle}>Panel Principal</NavLink>
 
-      {can(user, 'view', 'appointments') && <NavLink to="/appointments" style={linkStyle}>Citas</NavLink>}
-      {can(user, 'view', 'patients') && <NavLink to="/patients" style={linkStyle}>Pacientes</NavLink>}
+      {can(user, 'view', 'appointments') && <NavLink to="/citas" style={linkStyle}>Citas</NavLink>}
+      {can(user, 'view', 'patients') && <NavLink to="/pacientes" style={linkStyle}>Pacientes</NavLink>}
       {can(user, 'view', 'medical_records') && <NavLink to="/medical-records" style={linkStyle}>Historias Médicas</NavLink>}
       {can(user, 'view', 'users') && <NavLink to="/admin/users" style={linkStyle}>Gestión de Usuarios</NavLink>}
 

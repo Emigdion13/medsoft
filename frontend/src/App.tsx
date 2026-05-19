@@ -46,7 +46,7 @@ export default function App() {
       />
 
       <Route
-        path="/appointments"
+        path="/citas"
         element={
           <ProtectedLayout>
             <CanAccessRoute module="appointments">
@@ -57,7 +57,7 @@ export default function App() {
       />
 
       <Route
-        path="/patients"
+        path="/pacientes"
         element={
           <ProtectedLayout>
             <CanAccessRoute module="patients">

@@ -7,6 +7,17 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    optimizeDeps: {
+      include: [
+        '@mui/material',
+        '@mui/icons-material',
+        '@mui/x-date-pickers',
+        '@mui/x-date-pickers/AdapterDayjs',
+        '@mui/x-date-pickers/LocalizationProvider',
+        '@mui/x-date-pickers/DateTimePicker',
+        'dayjs',
+      ],
+    },
     server: {
       host: '0.0.0.0',
       allowedHosts: true,

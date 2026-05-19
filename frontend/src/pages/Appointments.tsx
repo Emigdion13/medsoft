@@ -10,7 +10,6 @@ import type {
   CreateAppointmentPayload,
   Doctor,
   Patient,
-  PaginatedResponse,
 } from '../types'
 
 type FormErrors = Record<string, string>
@@ -22,14 +21,38 @@ const APPOINTMENT_TYPES: { value: CreateAppointmentPayload['appointment_type']; 
   { value: 'SEGUIMIENTO', label: 'Seguimiento', icon: '📅' },
 ]
 
-// Status colors - calm, medical-appropriate palette
-const STATUS_CONFIG = {
-  PROGRAMADA: { color: '#3b82f6', light: '#eff6ff', label: 'Programada' },
-  CONFIRMADA: { color: '#10b981', light: '#ecfdf5', label: 'Confirmada' },
-  EN_CURSO: { color: '#f59e0b', light: '#fef3c7', label: 'En curso' },
-  COMPLETADA: { color: '#10b981', light: '#ecfdf5', label: 'Completada' },
-  CANCELADA: { color: '#ef4444', light: '#fef2f2', label: 'Cancelada' },
-  NO_ASISTIO: { color: '#6b7280', light: '#f3f4f6', label: 'No asistió' },
+const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
+  PROGRAMADA: { color: '#1d4ed8', bg: '#dbeafe', label: 'Programada' },
+  CONFIRMADA: { color: '#047857', bg: '#d1fae5', label: 'Confirmada' },
+  EN_CURSO: { color: '#b45309', bg: '#fef3c7', label: 'En curso' },
+  COMPLETADA: { color: '#047857', bg: '#d1fae5', label: 'Completada' },
+  CANCELADA: { color: '#b91c1c', bg: '#fee2e2', label: 'Cancelada' },
+  NO_ASISTIO: { color: '#374151', bg: '#e5e7eb', label: 'No asistió' },
+}
+
+// Quick time slots for one-click selection
+const TIME_PRESETS = [
+  { label: '08:00 AM', hour: 8 },
+  { label: '09:00 AM', hour: 9 },
+  { label: '10:00 AM', hour: 10 },
+  { label: '11:00 AM', hour: 11 },
+  { label: '02:00 PM', hour: 14 },
+  { label: '03:00 PM', hour: 15 },
+  { label: '04:00 PM', hour: 16 },
+]
+
+function toDatetimeLocal(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  const h = String(date.getHours()).padStart(2, '0')
+  const min = String(date.getMinutes()).padStart(2, '0')
+  return `${y}-${m}-${d}T${h}:${min}`
+}
+
+function fromDatetimeLocal(val: string): Date | null {
+  if (!val) return null
+  return new Date(val)
 }
 
 export default function Appointments() {
@@ -42,7 +65,6 @@ export default function Appointments() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [editingId, setEditingId] = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('all')
-  // Error state for API failures
   const [initError, setInitError] = useState<string | null>(null)
 
   const [form, setForm] = useState<Omit<CreateAppointmentPayload, 'notes'> & { notes: string }>({
@@ -55,7 +77,6 @@ export default function Appointments() {
     notes: '',
   })
 
-  // Load data on mount
   useEffect(() => {
     Promise.all([
       appointmentsService.list({ page: 1 }),
@@ -71,26 +92,14 @@ export default function Appointments() {
       })
       .catch((err) => {
         console.error('Failed to load initial data:', err)
-        const message = err instanceof Error ? err.message : 'Error al cargar los datos'
-        setInitError(message)
-        // Still set empty arrays so the form can render
-        setAppointments([])
-        setDoctors([])
-        setPatients([])
+        setInitError(err instanceof Error ? err.message : 'Error al cargar los datos')
+        setAppointments([]); setDoctors([]); setPatients([])
         setLoading(false)
       })
   }, [])
 
   const resetForm = () => {
-    setForm({
-      doctor_id: '',
-      patient_id: '',
-      start_at: '',
-      end_at: '',
-      appointment_type: 'CONSULTA',
-      reason: '',
-      notes: '',
-    })
+    setForm({ doctor_id: '', patient_id: '', start_at: '', end_at: '', appointment_type: 'CONSULTA', reason: '', notes: '' })
     setErrors({})
     setEditingId(null)
     setShowForm(false)
@@ -102,9 +111,7 @@ export default function Appointments() {
     if (!form.patient_id) errs.patient_id = 'Seleccione un paciente'
     if (!form.start_at) errs.start_at = 'La fecha y hora de inicio es obligatoria'
     if (!form.end_at) errs.end_at = 'La fecha y hora de fin es obligatoria'
-    if (form.start_at && form.end_at && form.end_at <= form.start_at) {
-      errs.end_at = 'La hora de fin debe ser posterior a la de inicio'
-    }
+    if (form.start_at && form.end_at && form.end_at <= form.start_at) errs.end_at = 'La hora de fin debe ser posterior a la de inicio'
     if (!form.reason.trim()) errs.reason = 'El motivo es obligatorio'
     setErrors(errs)
     return Object.keys(errs).length === 0
@@ -113,77 +120,33 @@ export default function Appointments() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
-
     setSubmitting(true)
     try {
-      const payload: CreateAppointmentPayload = {
-        ...form,
-        notes: form.notes || undefined,
-      }
-      
+      const payload: CreateAppointmentPayload = { ...form, notes: form.notes || undefined }
       let res
-      if (editingId) {
-        res = await appointmentsService.update(editingId, payload)
-      } else {
-        res = await appointmentsService.create(payload)
-      }
+      if (editingId) res = await appointmentsService.update(editingId, payload)
+      else res = await appointmentsService.create(payload)
       const created = res as Appointment
-
-      if (editingId) {
-        setAppointments((prev) =>
-          prev.map((a) => (a.id === editingId ? created : a))
-        )
-      } else {
-        setAppointments((prev) => [created, ...prev])
-      }
-
+      if (editingId) setAppointments(prev => prev.map(a => a.id === editingId ? created : a))
+      else setAppointments(prev => [created, ...prev])
       resetForm()
-      setShowForm(false)
     } catch (err: unknown) {
       const apiErr = err as { response?: { data?: Record<string, string[]> } }
-      const detail = apiErr.response?.data
-      if (detail) {
+      if (apiErr.response?.data) {
         const errs: FormErrors = {}
-        for (const [key, msgs] of Object.entries(detail)) {
-          errs[key] = msgs[0]
-        }
+        for (const [key, msgs] of Object.entries(apiErr.response.data)) errs[key] = msgs[0]
         setErrors(errs)
       }
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  // Helper to convert UTC datetime string to local timezone for display
-  // Returns a value suitable for datetime-local input (YYYY-MM-DDTHH:MM)
-  const formatDateTimeForInput = (isoString: string): string => {
-    // Parse the ISO string - Date constructor treats 'Z' suffix as UTC
-    const date = new Date(isoString)
-
-    // Get the user's local timezone components
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-
-    // Return in the format expected by datetime-local input
-    return `${year}-${month}-${day}T${hours}:${minutes}`
+    } finally { setSubmitting(false) }
   }
 
   const handleEdit = (a: Appointment) => {
     setEditingId(a.id)
-    
-    // Convert UTC datetime from API to user's local timezone for display
-    // This ensures the form shows times in the user's current timezone context
-    const startLocal = formatDateTimeForInput(a.start_at)
-    const endLocal = formatDateTimeForInput(a.end_at)
-    
     setForm({
       doctor_id: a.doctor.id,
       patient_id: a.patient.id,
-      start_at: startLocal,
-      end_at: endLocal,
+      start_at: new Date(a.start_at).toISOString().slice(0, 16),
+      end_at: new Date(a.end_at).toISOString().slice(0, 16),
       appointment_type: a.appointment_type,
       reason: a.reason || '',
       notes: a.notes || '',
@@ -194,423 +157,205 @@ export default function Appointments() {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('¿Está seguro de eliminar esta cita?')) return
-    try {
-      await appointmentsService.delete(id)
-      setAppointments((prev) => prev.filter((a) => a.id !== id))
-    } catch {
-      // ignore
-    }
+    try { await appointmentsService.delete(id); setAppointments(prev => prev.filter(a => a.id !== id)) } catch {}
   }
 
   const handleCancel = async (id: string) => {
     if (!window.confirm('¿Cancelar esta cita?')) return
-    try {
-      await appointmentsService.cancel(id)
-      setAppointments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status: 'CANCELADA' as const } : a))
-      )
-    } catch {
-      // ignore
-    }
+    try { await appointmentsService.cancel(id); setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: 'CANCELADA' as const } : a)) } catch {}
   }
 
-  const statusColor = (status: string) => {
-    switch (status) {
-      case 'PROGRAMADA': return '#3b82f6'
-      case 'CONFIRMADA': return '#8b5cf6'
-      case 'EN_CURSO': return '#f59e0b'
-      case 'COMPLETADA': return '#10b981'
-      case 'CANCELADA': return '#ef4444'
-      case 'NO_ASISTIO': return '#6b7280'
-      default: return '#6b7280'
-    }
+  const setTimePreset = (hour: number) => {
+    const today = new Date()
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour, 0, 0)
+    const end = new Date(start.getTime() + 60 * 60 * 1000)
+    setForm({ ...form, start_at: toDatetimeLocal(start), end_at: toDatetimeLocal(end) })
   }
 
-  const statusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      PROGRAMADA: 'Programada',
-      CONFIRMADA: 'Confirmada',
-      EN_CURSO: 'En curso',
-      COMPLETADA: 'Completada',
-      CANCELADA: 'Cancelada',
-      NO_ASISTIO: 'No asistió',
-    }
-    return labels[status] || status
-  }
+  const filtered = filterStatus === 'all' ? appointments : appointments.filter(a => a.status === filterStatus)
 
-  if (loading) return <PageContainer title="Citas"><p>Cargando...</p></PageContainer>
+  if (loading) return <PageContainer title="Citas"><p style={{ color: '#6b7280', padding: 24 }}>Cargando...</p></PageContainer>
 
   return (
     <PageContainer title="Citas">
       {/* ── Toolbar ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <span style={{ color: '#6b7280' }}>
-          {appointments.length} cita{appointments.length !== 1 ? 's' : ''}
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            if (showForm) {
-              setShowForm(false)
-              resetForm()
-            } else {
-              setShowForm(true)
-            }
-          }}
-          style={{
-            background: '#3b82f6',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            padding: '8px 16px',
-            cursor: 'pointer',
-            fontWeight: 500,
-          }}
-        >
-          {showForm ? 'Cerrar' : '+ Nueva Cita'}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 600, fontSize: 14, color: '#374151' }}>{appointments.length} cita{appointments.length !== 1 ? 's' : ''}</span>
+          {['all', 'PROGRAMADA', 'CONFIRMADA', 'COMPLETADA', 'CANCELADA'].map(s => (
+            <button key={s} type="button" onClick={() => setFilterStatus(s)}
+              style={{
+                padding: '4px 12px', borderRadius: 20, border: filterStatus === s ? '2px solid #2563eb' : '1px solid #d1d5db',
+                background: filterStatus === s ? '#eff6ff' : '#fff', color: filterStatus === s ? '#1d4ed8' : '#6b7280',
+                fontSize: 12, fontWeight: filterStatus === s ? 600 : 400, cursor: 'pointer',
+              }}>
+              {s === 'all' ? 'Todas' : STATUS_CONFIG[s]?.label || s}
+            </button>
+          ))}
+        </div>
+        <button type="button" onClick={() => showForm ? resetForm() : setShowForm(true)}
+          style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+          {showForm ? '✕ Cerrar' : '+ Nueva Cita'}
         </button>
       </div>
 
       {/* ── Form ── */}
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            background: '#fff',
-            border: '1px solid #e5e7eb',
-            borderRadius: 10,
-            padding: 20,
-            marginBottom: 20,
-          }}
-        >
-          <h3 style={{ marginTop: 0, marginBottom: 16 }}>
-            {editingId ? 'Editar Cita' : 'Crear Cita'}
-          </h3>
+        <form onSubmit={handleSubmit} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 24, marginBottom: 20, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+          <h3 style={{ margin: '0 0 20px 0', fontSize: 18, color: '#1f2937' }}>📅 {editingId ? 'Editar Cita' : 'Crear Cita'}</h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            {/* Doctor */}
+          {/* Doctor + Patient row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
             <div>
-              <label htmlFor="doctor-select" style={{ display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }}>
-                Médico <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <select
-                id="doctor-select"
-                value={form.doctor_id}
-                onChange={(e) => setForm({ ...form, doctor_id: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 6,
-                  border: `1px solid ${errors.doctor_id ? '#ef4444' : '#d1d5db'}`,
-                  fontSize: 14,
-                }}
-              >
+              <label style={labelStyle}>Médico <span style={{ color: '#ef4444' }}>*</span></label>
+              <select value={form.doctor_id} onChange={e => setForm({ ...form, doctor_id: e.target.value })}
+                style={selectStyle(errors.doctor_id)}>
                 <option value="">Seleccione médico...</option>
-                {doctors.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.first_name} {d.last_name} — {d.specialty_main?.name || 'Sin especialidad'}
-                  </option>
-                ))}
+                {doctors.map(d => <option key={d.id} value={d.id}>{d.first_name} {d.last_name} — {d.specialty_main?.name || 'Sin especialidad'}</option>)}
               </select>
-              {errors.doctor_id && <span style={{ color: '#ef4444', fontSize: 12 }}>{errors.doctor_id}</span>}
+              {errors.doctor_id && <span style={errStyle}>{errors.doctor_id}</span>}
             </div>
-
-            {/* Patient */}
             <div>
-              <label htmlFor="patient-select" style={{ display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }}>
-                Paciente <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <select
-                id="patient-select"
-                value={form.patient_id}
-                onChange={(e) => setForm({ ...form, patient_id: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 6,
-                  border: `1px solid ${errors.patient_id ? '#ef4444' : '#d1d5db'}`,
-                  fontSize: 14,
-                }}
-              >
+              <label style={labelStyle}>Paciente <span style={{ color: '#ef4444' }}>*</span></label>
+              <select value={form.patient_id} onChange={e => setForm({ ...form, patient_id: e.target.value })}
+                style={selectStyle(errors.patient_id)}>
                 <option value="">Seleccione paciente...</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.first_name} {p.last_name} — {p.cedula}
-                  </option>
-                ))}
+                {patients.map(p => <option key={p.id} value={p.id}>{p.first_name} {p.last_name} — {p.cedula}</option>)}
               </select>
-              {errors.patient_id && <span style={{ color: '#ef4444', fontSize: 12 }}>{errors.patient_id}</span>}
+              {errors.patient_id && <span style={errStyle}>{errors.patient_id}</span>}
             </div>
+          </div>
 
-            {/* Start */}
-            <div>
-              <label htmlFor="start-at" style={{ display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }}>
-                Inicio <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                id="start-at"
-                type="datetime-local"
-                value={form.start_at}
-                onChange={(e) => setForm({ ...form, start_at: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 6,
-                  border: `1px solid ${errors.start_at ? '#ef4444' : '#d1d5db'}`,
-                  fontSize: 14,
-                }}
-              />
-              {errors.start_at && <span style={{ color: '#ef4444', fontSize: 12 }}>{errors.start_at}</span>}
-            </div>
-
-            {/* End */}
-            <div>
-              <label htmlFor="end-at" style={{ display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }}>
-                Fin <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                id="end-at"
-                type="datetime-local"
-                value={form.end_at}
-                onChange={(e) => setForm({ ...form, end_at: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 6,
-                  border: `1px solid ${errors.end_at ? '#ef4444' : '#d1d5db'}`,
-                  fontSize: 14,
-                }}
-              />
-              {errors.end_at && <span style={{ color: '#ef4444', fontSize: 12 }}>{errors.end_at}</span>}
-            </div>
-
-            {/* Type */}
-            <div>
-              <label htmlFor="appointment-type" style={{ display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }}>
-                Tipo
-              </label>
-              <select
-                id="appointment-type"
-                value={form.appointment_type}
-                onChange={(e) => setForm({ ...form, appointment_type: e.target.value as CreateAppointmentPayload['appointment_type'] })}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
-              >
-                {APPOINTMENT_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
+          {/* ⋙ DATE/TIME PICKERS ⟀ */}
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: 20, marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h4 style={{ margin: 0, fontSize: 14, color: '#475569', fontWeight: 600 }}>📆 Selección de Fecha y Hora</h4>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {TIME_PRESETS.map(t => (
+                  <button key={t.hour} type="button" onClick={() => setTimePreset(t.hour)}
+                    style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: 11, cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                    {t.label}
+                  </button>
                 ))}
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ ...labelStyle, marginBottom: 4 }}>Fecha y hora de inicio <span style={{ color: '#ef4444' }}>*</span></label>
+                <input id="start-at" type="datetime-local" value={form.start_at}
+                  onChange={e => setForm({ ...form, start_at: e.target.value })}
+                  style={inputStyle(errors.start_at)} />
+                {errors.start_at && <span style={errStyle}>{errors.start_at}</span>}
+              </div>
+              <div>
+                <label style={{ ...labelStyle, marginBottom: 4 }}>Fecha y hora de fin <span style={{ color: '#ef4444' }}>*</span></label>
+                <input id="end-at" type="datetime-local" value={form.end_at}
+                  onChange={e => setForm({ ...form, end_at: e.target.value })}
+                  style={inputStyle(errors.end_at)} />
+                {errors.end_at && <span style={errStyle}>{errors.end_at}</span>}
+              </div>
+            </div>
+          </div>
+
+          {/* Type + Reason row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+            <div>
+              <label style={labelStyle}>Tipo de cita</label>
+              <select value={form.appointment_type} onChange={e => setForm({ ...form, appointment_type: e.target.value as CreateAppointmentPayload['appointment_type'] })}
+                style={selectStyle()}>
+                {APPOINTMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
               </select>
             </div>
-
-            {/* Reason */}
             <div>
-              <label htmlFor="appointment-reason" style={{ display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }}>
-                Motivo <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                id="appointment-reason"
-                type="text"
-                placeholder="Motivo de la visita..."
-                value={form.reason}
-                onChange={(e) => setForm({ ...form, reason: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 6,
-                  border: `1px solid ${errors.reason ? '#ef4444' : '#d1d5db'}`,
-                  fontSize: 14,
-                  boxSizing: 'border-box',
-                }}
-              />
-              {errors.reason && <span style={{ color: '#ef4444', fontSize: 12 }}>{errors.reason}</span>}
+              <label style={labelStyle}>Motivo <span style={{ color: '#ef4444' }}>*</span></label>
+              <input type="text" placeholder="Motivo de la visita..." value={form.reason}
+                onChange={e => setForm({ ...form, reason: e.target.value })}
+                style={inputStyle(errors.reason)} />
+              {errors.reason && <span style={errStyle}>{errors.reason}</span>}
             </div>
           </div>
 
           {/* Notes */}
-          <div style={{ marginTop: 16 }}>
-            <label htmlFor="appointment-notes" style={{ display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }}>Notas</label>
-            <textarea
-              id="appointment-notes"
-              value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              rows={2}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 6,
-                border: '1px solid #d1d5db',
-                fontSize: 14,
-                resize: 'vertical',
-                boxSizing: 'border-box',
-              }}
-            />
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>Notas (opcional)</label>
+            <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2}
+              placeholder="Observaciones adicionales..."
+              style={{ ...textareaStyle, width: '100%', boxSizing: 'border-box' }} />
           </div>
 
-          {/* Error Banner */}
           {initError && (
-            <div style={{
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              color: '#991b1b',
-              padding: '12px 16px',
-              borderRadius: 8,
-              marginBottom: 16,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
-                <strong>Error al cargar los datos</strong>
-                <p style={{ margin: '4px 0 0', fontSize: 13 }}>{initError}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setInitError(null)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#991b1b',
-                  cursor: 'pointer',
-                  fontSize: 20,
-                  padding: '4px 8px'
-                }}
-              >
-                ✕
-              </button>
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '10px 14px', borderRadius: 8, marginBottom: 16, fontSize: 13 }}>
+              <strong>Error:</strong> {initError}
             </div>
           )}
 
-          {/* Submit */}
-          <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-            <button
-              type="submit"
-              disabled={submitting}
-              style={{
-                background: submitting ? '#93c5fd' : '#3b82f6',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                padding: '8px 20px',
-                cursor: submitting ? 'not-allowed' : 'pointer',
-                fontWeight: 500,
-              }}
-            >
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="submit" disabled={submitting}
+              style={{ background: submitting ? '#93c5fd' : '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 24px', cursor: submitting ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: 14 }}>
               {submitting ? (editingId ? 'Guardando...' : 'Creando...') : (editingId ? 'Guardar Cambios' : 'Crear')}
             </button>
-            <button
-              type="button"
-              onClick={() => { setShowForm(false); resetForm() }}
-              style={{
-                background: '#f3f4f6',
-                color: '#374151',
-                border: '1px solid #d1d5db',
-                borderRadius: 6,
-                padding: '8px 20px',
-                cursor: 'pointer',
-                fontWeight: 500,
-              }}
-            >
-              Cancelar
+            <button type="button" onClick={resetForm}
+              style={{ background: '#f9fafb', color: '#374151', border: '1px solid #d1d5db', borderRadius: 8, padding: '10px 20px', cursor: 'pointer', fontWeight: 500, fontSize: 14 }}>
+              Cerrar
             </button>
           </div>
         </form>
       )}
 
       {/* ── List ── */}
-      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' }}>
-        {appointments.length === 0 ? (
-          <p style={{ padding: 24, margin: 0, color: '#6b7280', textAlign: 'center' }}>
-            No hay citas. Haga clic en <strong>+ Nueva Cita</strong> para crear una.
-          </p>
+      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        {filtered.length === 0 ? (
+          <div style={{ padding: 48, textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 8 }}>📋</div>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: 15 }}>
+              {appointments.length === 0 ? <>No hay citas. Haga clic en <strong>+ Nueva Cita</strong> para crear una.</> : 'No hay citas con el filtro seleccionado.'}
+            </p>
+          </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
             <thead>
-              <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Paciente</th>
-                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Médico</th>
-                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Fecha</th>
-                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Tipo</th>
-                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Estado</th>
-                <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Acciones</th>
+              <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e5e7eb' }}>
+                <th style={thStyle}>Paciente</th>
+                <th style={thStyle}>Médico</th>
+                <th style={thStyle}>Fecha</th>
+                <th style={thStyle}>Tipo</th>
+                <th style={thStyle}>Estado</th>
+                <th style={thStyle}>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {appointments.map((a) => (
-                <tr key={a.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                  <td style={{ padding: '12px 16px' }}>
-                    {a.patient.first_name} {a.patient.last_name}
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    {a.doctor.first_name} {a.doctor.last_name}
-                  </td>
-                  <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                    {new Date(a.start_at).toLocaleString('es-DO')}
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    {APPOINTMENT_TYPES.find((t) => t.value === a.appointment_type)?.label || a.appointment_type}
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <span style={{
-                      display: 'inline-block',
-                      padding: '2px 10px',
-                      borderRadius: 9999,
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: '#fff',
-                      background: statusColor(a.status),
-                    }}>
-                      {statusLabel(a.status)}
-                    </span>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      {a.status !== 'CANCELADA' && (
-                        <button
-                          onClick={() => handleCancel(a.id)}
-                          style={{
-                            background: 'none',
-                            border: '1px solid #ef4444',
-                            color: '#ef4444',
-                            borderRadius: 4,
-                            padding: '4px 10px',
-                            cursor: 'pointer',
-                            fontSize: 12,
-                          }}
-                        >
-                          Cancelar
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleEdit(a)}
-                        style={{
-                          background: 'none',
-                          border: '1px solid #3b82f6',
-                          color: '#3b82f6',
-                          borderRadius: 4,
-                          padding: '4px 10px',
-                          cursor: 'pointer',
-                          fontSize: 12,
-                        }}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(a.id)}
-                        style={{
-                          background: 'none',
-                          border: '1px solid #6b7280',
-                          color: '#6b7280',
-                          borderRadius: 4,
-                          padding: '4px 10px',
-                          cursor: 'pointer',
-                          fontSize: 12,
-                        }}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map(a => {
+                const st = STATUS_CONFIG[a.status] || { color: '#6b7280', bg: '#f3f4f6', label: a.status }
+                return (
+                  <tr key={a.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '12px 16px', fontWeight: 500 }}>{a.patient.first_name} {a.patient.last_name}</td>
+                    <td style={{ padding: '12px 16px', color: '#475569' }}>{a.doctor.first_name} {a.doctor.last_name}</td>
+                    <td style={{ padding: '12px 16px', whiteSpace: 'nowrap', fontSize: 13, color: '#475569' }}>
+                      {new Date(a.start_at).toLocaleString('es-DO', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: 13 }}>
+                      {APPOINTMENT_TYPES.find(t => t.value === a.appointment_type)?.label || a.appointment_type}
+                    </td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{ display: 'inline-block', padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg }}>
+                        {st.label}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {a.status !== 'CANCELADA' && (
+                          <button onClick={() => handleCancel(a.id)}
+                            style={actionBtnStyle('#ef4444')}>Cancelar</button>
+                        )}
+                        <button onClick={() => handleEdit(a)}
+                          style={actionBtnStyle('#2563eb')}>Editar</button>
+                        <button onClick={() => handleDelete(a.id)}
+                          style={actionBtnStyle('#6b7280')}>Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         )}
@@ -618,3 +363,23 @@ export default function Appointments() {
     </PageContainer>
   )
 }
+
+// ── styles ──
+
+const labelStyle: React.CSSProperties = { display: 'block', marginBottom: 4, fontWeight: 600, fontSize: 13, color: '#374151' }
+const errStyle: React.CSSProperties = { color: '#ef4444', fontSize: 12, marginTop: 2, display: 'block' }
+const thStyle: React.CSSProperties = { textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#475569', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }
+
+const inputStyle = (err?: string): React.CSSProperties => ({
+  width: '100%', padding: '10px 14px', borderRadius: 8, border: `2px solid ${err ? '#fca5a5' : '#e2e8f0'}`,
+  fontSize: 14, boxSizing: 'border-box', background: '#fff', outline: 'none',
+  transition: 'border-color 0.15s',
+})
+const selectStyle = (err?: string): React.CSSProperties => ({
+  width: '100%', padding: '10px 14px', borderRadius: 8, border: `2px solid ${err ? '#fca5a5' : '#e2e8f0'}`,
+  fontSize: 14, boxSizing: 'border-box', background: '#fff', outline: 'none',
+})
+const textareaStyle: React.CSSProperties = { ...inputStyle(), resize: 'vertical' }
+const actionBtnStyle = (color: string): React.CSSProperties => ({
+  background: 'none', border: `1px solid ${color}`, color, borderRadius: 6, padding: '4px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 500,
+})

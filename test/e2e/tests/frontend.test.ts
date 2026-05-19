@@ -30,13 +30,13 @@ test.describe('Pruebas de Interfaz Frontend', () => {
 
   test('should navigate to appointments page when clicking Appointments link', async ({ page }) => {
     await page.getByRole('link', { name: 'Citas', exact: true }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 5000 });
     await expect(page.getByRole('heading', { name: 'Citas' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 
   test('should navigate to patients page when clicking Patients link', async ({ page }) => {
     await page.getByRole('link', { name: 'Pacientes' }).click();
-    await expect(page).toHaveURL(/\/patients$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/pacientes$/, { timeout: 5000 });
     await expect(page.getByRole('heading', { name: 'Pacientes' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 

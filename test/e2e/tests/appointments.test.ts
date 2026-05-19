@@ -17,7 +17,7 @@ test.describe('Appointments Navigation', () => {
     await expect(todayLink).toBeVisible({ timeout: 10000 });
     await todayLink.scrollIntoViewIfNeeded();
     await todayLink.click({ force: true });
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 10000 });
     await expect(page.getByRole('heading', { name: 'Citas' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 
@@ -30,7 +30,7 @@ test.describe('Appointments Navigation', () => {
 
     // Click Appointments link in sidebar (use exact to avoid matching "Citas de Hoy")
     await page.getByRole('link', { name: 'Citas', exact: true }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 5000 });
     await expect(page.getByRole('heading', { name: 'Citas' })).toBeVisible({ timeout: 5000 });
   }, { timeout: 30000 });
 });
@@ -47,7 +47,7 @@ test.describe('Appointments CRUD', () => {
   test('should open and close the new appointment form', async ({ page }) => {
     // Click sidebar link (exact match to avoid "Citas de Hoy" card)
     await page.getByRole('link', { name: 'Citas', exact: true }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 5000 });
 
     // Click "New Appointment" to open the form
     await page.getByRole('button', { name: /nueva cita/i }).click();
@@ -61,7 +61,7 @@ test.describe('Appointments CRUD', () => {
   test('should display validation errors on empty form submission', async ({ page }) => {
     // Click sidebar link (exact match to avoid "Citas de Hoy" card)
     await page.getByRole('link', { name: 'Citas', exact: true }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 5000 });
 
     // Open the form
     await page.getByRole('button', { name: /nueva cita/i }).click();
@@ -79,7 +79,7 @@ test.describe('Appointments CRUD', () => {
   test('should create an appointment via the API and verify it appears in the list', async ({ page }) => {
     // Click sidebar link (exact match to avoid "Citas de Hoy" card)
     await page.getByRole('link', { name: 'Citas', exact: true }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 5000 });
 
     // Get a doctor and patient via the API - with retry for login
     let token = '';
@@ -137,7 +137,7 @@ test.describe('Appointments CRUD', () => {
           start_at: apiStart.toISOString(),
           end_at: apiEnd.toISOString(),
           reason: uniqueReason,
-          type: 'CONSULTA',
+          appointment_type: 'CONSULTA',
         },
       });
 
@@ -182,7 +182,7 @@ test.describe('Appointments CRUD', () => {
   test('should cancel an existing appointment', async ({ page }) => {
     // Click sidebar link (exact match to avoid "Citas de Hoy" card)
     await page.getByRole('link', { name: 'Citas', exact: true }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 10000 });
 
     // Get the JWT token from localStorage (key is 'accessToken' per frontend session.ts)
     const token = await page.evaluate(() => {
@@ -292,7 +292,7 @@ test.describe('Appointments CRUD', () => {
   test('should display appointment time correctly (timezone roundtrip - America/Santo_Domingo)', async ({ page }) => {
     // Click sidebar link (exact match to avoid "Citas de Hoy" card)
     await page.getByRole('link', { name: 'Citas', exact: true }).click();
-    await expect(page).toHaveURL(/\/appointments$/, { timeout: 5000 });
+    await expect(page).toHaveURL(/\/citas$/, { timeout: 5000 });
 
     // Get a doctor and patient via the API - with retry for login
     let token = '';
@@ -347,7 +347,7 @@ test.describe('Appointments CRUD', () => {
           start_at: apiStart.toISOString(),
           end_at: apiEnd.toISOString(),
           reason: tzReason,
-          type: 'CONSULTA',
+          appointment_type: 'CONSULTA',
         },
       });
 

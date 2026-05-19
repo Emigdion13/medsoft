@@ -7,7 +7,7 @@ export default function Dashboard() {
   return (
     <PageContainer title="Panel de Control">
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 12 }}>
-        <Link to="/appointments" style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, textDecoration: 'none', color: 'inherit', display: 'block' }}>
+        <Link to="/citas" style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16, textDecoration: 'none', color: 'inherit', display: 'block' }}>
           Citas de Hoy
         </Link>
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: 16 }}>Tareas Pendientes</div>
