@@ -317,7 +317,8 @@ export default function Appointments() {
               <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e5e7eb' }}>
                 <th style={thStyle}>Paciente</th>
                 <th style={thStyle}>Médico</th>
-                <th style={thStyle}>Fecha</th>
+                <th style={thStyle}>Inicio</th>
+                <th style={thStyle}>Fin</th>
                 <th style={thStyle}>Tipo</th>
                 <th style={thStyle}>Estado</th>
                 <th style={thStyle}>Acciones</th>
@@ -332,6 +333,9 @@ export default function Appointments() {
                     <td style={{ padding: '12px 16px', color: '#475569' }}>{a.doctor.first_name} {a.doctor.last_name}</td>
                     <td style={{ padding: '12px 16px', whiteSpace: 'nowrap', fontSize: 13, color: '#475569' }}>
                       {new Date(a.start_at).toLocaleString('es-DO', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td style={{ padding: '12px 16px', whiteSpace: 'nowrap', fontSize: 13, color: '#64748b' }}>
+                      {new Date(a.end_at).toLocaleString('es-DO', { hour: '2-digit', minute: '2-digit' })}
                     </td>
                     <td style={{ padding: '12px 16px', fontSize: 13 }}>
                       {APPOINTMENT_TYPES.find(t => t.value === a.appointment_type)?.label || a.appointment_type}

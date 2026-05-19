@@ -318,4 +318,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         if patient_id:
             validated_data['patient_id'] = patient_id
 
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+        # Run model-level clean() for additional validation (overlap check)
+        instance.full_clean()
+        return instance

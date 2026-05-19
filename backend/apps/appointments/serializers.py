@@ -68,13 +68,19 @@ class AppointmentSerializer(serializers.ModelSerializer):
         if request and hasattr(request, 'user'):
             validated_data['created_by'] = request.user
             validated_data['updated_by'] = request.user
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+        # Force model-level validation (overlap check in clean())
+        instance.full_clean()
+        return instance
 
     def update(self, instance: Appointment, validated_data: dict) -> Appointment:
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['updated_by'] = request.user
-        return super().update(instance, validated_data)
+        instance = super().update(instance, validated_data)
+        # Force model-level validation (overlap check in clean())
+        instance.full_clean()
+        return instance
 
 
 class AppointmentLookupSerializer(serializers.ModelSerializer):
