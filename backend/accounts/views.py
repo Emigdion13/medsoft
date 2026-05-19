@@ -123,28 +123,38 @@ def me_view(request: Request) -> Response:
     return Response(serializer.data)
 
 
+class UserPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """CRUD operations for users."""
 
     queryset = User.objects.filter(is_active=True, deleted_at__isnull=True).order_by('-created_at')
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = UserPagination
 
     def get_queryset(self) -> Any:
         """Filter queryset based on current user scope."""
         queryset = super().get_queryset()
 
+        # Filter by organization (same org as requesting user)
+        user = self.request.user
+        if hasattr(user, 'organization') and user.organization:
+            queryset = queryset.filter(organization=user.organization)
+
         search = self.request.query_params.get('search')
         if search:
             queryset = queryset.filter(
-                username__icontains=search
-            ) | queryset.filter(
-                first_name__icontains=search
-            ) | queryset.filter(
-                last_name__icontains=search
+                Q(username__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)
             )
 
-        return queryset
+        return queryset.distinct()
 
     def perform_create(self, serializer: UserSerializer) -> None:
         """Set organization from the requesting user."""
