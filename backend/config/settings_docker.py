@@ -3,6 +3,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
+assert SECRET_KEY != 'change-me-in-production', (
+    'DJANGO_SECRET_KEY must be set in environment. '
+    'Do NOT use the default value in production.'
+)
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'false').lower() == 'true'
 

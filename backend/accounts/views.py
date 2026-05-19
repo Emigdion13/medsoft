@@ -32,16 +32,15 @@ from .token_utils import get_tokens_for_user
 @permission_classes([AllowAny])
 def login_view(request: Request) -> Response:
     """Login user and return tokens."""
-    # Debug logging
-    print(f"DEBUG: request.data = {request.data}")
-    print(f"DEBUG: request.content_type = {getattr(request, 'content_type', 'N/A')}")
-    
     serializer = LoginSerializer(data=request.data)
     try:
         serializer.is_valid(raise_exception=True)
-    except Exception as e:
-        print(f"DEBUG: Serializer errors = {serializer.errors}")
-        raise
+    except Exception:
+        # Return generic error to avoid username enumeration
+        return Response(
+            {'detail': 'Invalid credentials'},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
 
     username = serializer.validated_data['username']
     password = serializer.validated_data['password']
