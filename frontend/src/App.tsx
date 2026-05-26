@@ -1,7 +1,6 @@
 import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
-import TopBar from './components/layout/TopBar'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -9,6 +8,7 @@ import Appointments from './pages/Appointments'
 import Patients from './pages/Patients'
 import MedicalRecords from './pages/MedicalRecords'
 import AdminUsersPage from './pages/admin/UsersPage'
+import SpecialtiesPage from './pages/admin/SpecialtiesPage'
 import { CanAccessRoute } from './lib/rbac/guards'
 import { useAuth } from './utils/auth'
 
@@ -19,12 +19,11 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   if (!isAuthenticated) return <Navigate to="/login" replace />
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', minHeight: '100vh' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', minHeight: '100vh' }}>
       <Sidebar />
-      <div>
-        <TopBar />
+      <main style={{ overflow: 'auto' }}>
         {children}
-      </div>
+      </main>
     </div>
   )
 }
@@ -95,6 +94,17 @@ export default function App() {
           <ProtectedLayout>
             <CanAccessRoute module="users">
               <Register />
+            </CanAccessRoute>
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/admin/specialties"
+        element={
+          <ProtectedLayout>
+            <CanAccessRoute module="users">
+              <SpecialtiesPage />
             </CanAccessRoute>
           </ProtectedLayout>
         }

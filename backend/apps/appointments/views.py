@@ -35,6 +35,26 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         if hasattr(user, 'organization') and user.organization:
             qs = qs.filter(organization=user.organization)
 
+        # ── Role-based visibility ──
+        role = getattr(user, 'role', '')
+        if role == 'DOCTOR':
+            # Doctors see only their own appointments
+            from apps.doctors.models import Doctor
+            try:
+                doctor = Doctor.objects.get(user=user, is_active=True)
+                qs = qs.filter(doctor=doctor)
+            except Doctor.DoesNotExist:
+                return qs.none()
+        elif role == 'SECRETARY':
+            # Secretaries see appointments of their assigned doctors
+            from apps.doctors.models import SecretaryDoctor
+            doctor_ids = SecretaryDoctor.objects.filter(
+                secretary=user, is_active=True
+            ).values_list('doctor_id', flat=True)
+            qs = qs.filter(doctor_id__in=doctor_ids)
+
+        # ADMINISTRATOR, RECEPTIONIST, NURSE, LAB_TECHNICIAN see all org appointments
+
         params = self.request.query_params
 
         # Filter by patient

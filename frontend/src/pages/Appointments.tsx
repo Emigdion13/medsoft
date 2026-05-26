@@ -30,16 +30,32 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }
   NO_ASISTIO: { color: '#374151', bg: '#e5e7eb', label: 'No asistió' },
 }
 
-// Quick time slots for one-click selection
-const TIME_PRESETS = [
-  { label: '08:00 AM', hour: 8 },
-  { label: '09:00 AM', hour: 9 },
-  { label: '10:00 AM', hour: 10 },
-  { label: '11:00 AM', hour: 11 },
-  { label: '02:00 PM', hour: 14 },
-  { label: '03:00 PM', hour: 15 },
-  { label: '04:00 PM', hour: 16 },
-]
+// 30-minute time slots for one-click selection (morning + afternoon)
+function generateTimeSlots() {
+  const slots: { hour: number; minute: number; label: string; endLabel: string }[] = []
+  const morning = [8, 9, 10, 11]
+  const afternoon = [12, 13, 14, 15, 16, 17]
+  for (const h of [...morning, ...afternoon]) {
+    for (const m of [0, 30]) {
+      const startH = h + Math.floor(m / 60)
+      const startM = m % 60
+      const end = new Date(2020, 0, 1, startH, startM + 30)
+      const endH = end.getHours()
+      const endM = end.getMinutes()
+      const fmt = (hh: number, mm: number) =>
+        `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
+      const period = (hh: number) => (hh < 12 ? 'AM' : 'PM')
+      slots.push({
+        hour: startH,
+        minute: startM,
+        label: `${fmt(h % 12 || 12, m)} ${period(h)}`,
+        endLabel: `${fmt(endH % 12 || 12, endM)} ${period(endH)}`,
+      })
+    }
+  }
+  return slots
+}
+const TIME_SLOTS = generateTimeSlots()
 
 function toDatetimeLocal(date: Date): string {
   const y = date.getFullYear()
@@ -165,11 +181,47 @@ export default function Appointments() {
     try { await appointmentsService.cancel(id); setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: 'CANCELADA' as const } : a)) } catch {}
   }
 
-  const setTimePreset = (hour: number) => {
-    const today = new Date()
-    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour, 0, 0)
-    const end = new Date(start.getTime() + 60 * 60 * 1000)
+  const setTimeSlot = (hour: number, minute: number) => {
+    // Use selected date or today
+    const dateStr = form.start_at ? form.start_at.slice(0, 10) : new Date().toISOString().slice(0, 10)
+    const start = new Date(`${dateStr}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`)
+    const end = new Date(start.getTime() + 30 * 60 * 1000)
     setForm({ ...form, start_at: toDatetimeLocal(start), end_at: toDatetimeLocal(end) })
+  }
+
+  const setDateOnly = (dateStr: string) => {
+    // Keep existing time if set, otherwise default to 8:00-8:30
+    if (form.start_at) {
+      const timePart = form.start_at.slice(11, 16)
+      const endTimePart = form.end_at ? form.end_at.slice(11, 16) : '08:30'
+      setForm({
+        ...form,
+        start_at: `${dateStr}T${timePart}`,
+        end_at: `${dateStr}T${endTimePart}`,
+      })
+    } else {
+      setForm({
+        ...form,
+        start_at: `${dateStr}T08:00`,
+        end_at: `${dateStr}T08:30`,
+      })
+    }
+  }
+
+  const dateOnlyValue = form.start_at ? form.start_at.slice(0, 10) : ''
+
+  // Check if a time slot overlaps any existing appointment (excluding the one being edited)
+  const isSlotBooked = (slotHour: number, slotMinute: number): boolean => {
+    if (!dateOnlyValue) return false
+    const slotStart = new Date(`${dateOnlyValue}T${String(slotHour).padStart(2,'0')}:${String(slotMinute).padStart(2,'0')}:00`)
+    const slotEnd = new Date(slotStart.getTime() + 30 * 60 * 1000)
+    return appointments.some(a => {
+      if (editingId && a.id === editingId) return false // don't block own slot when editing
+      if (a.status === 'CANCELADA' || a.status === 'NO_ASISTIO') return false
+      const aStart = new Date(a.start_at)
+      const aEnd = new Date(a.end_at)
+      return slotStart < aEnd && slotEnd > aStart // overlap check
+    })
   }
 
   const filtered = filterStatus === 'all' ? appointments : appointments.filter(a => a.status === filterStatus)
@@ -226,29 +278,98 @@ export default function Appointments() {
             </div>
           </div>
 
-          {/* ⋙ DATE/TIME PICKERS ⟀ */}
+          {/* ⋙ DATE + TIME BLOCKS ⟀ */}
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: 20, marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h4 style={{ margin: 0, fontSize: 14, color: '#475569', fontWeight: 600 }}>📆 Selección de Fecha y Hora</h4>
-              <div style={{ display: 'flex', gap: 4 }}>
-                {TIME_PRESETS.map(t => (
-                  <button key={t.hour} type="button" onClick={() => setTimePreset(t.hour)}
-                    style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: 11, cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                    {t.label}
-                  </button>
-                ))}
+            <h4 style={{ margin: '0 0 14px', fontSize: 14, color: '#475569', fontWeight: 600 }}>
+              📆 Selección de Fecha y Hora
+            </h4>
+
+            {/* Date picker */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ ...labelStyle, marginBottom: 4, display: 'block' }}>Fecha <span style={{ color: '#ef4444' }}>*</span></label>
+              <input type="date" value={dateOnlyValue}
+                onChange={e => setDateOnly(e.target.value)}
+                style={{ ...inputStyle(), width: 220 }} />
+            </div>
+
+            {/* Time slot blocks */}
+            <div style={{ marginBottom: 4 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 8 }}>
+                Mañana — clic para seleccionar horario (30 min)
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8, marginBottom: 16 }}>
+                {TIME_SLOTS.filter(s => s.hour < 12).map(slot => {
+                  const startVal = `${dateOnlyValue || new Date().toISOString().slice(0,10)}T${String(slot.hour).padStart(2,'0')}:${String(slot.minute).padStart(2,'0')}`
+                  const isSelected = form.start_at === startVal
+                  const booked = isSlotBooked(slot.hour, slot.minute)
+                  return (
+                    <button key={startVal} type="button"
+                      disabled={booked}
+                      onClick={() => setTimeSlot(slot.hour, slot.minute)}
+                      style={{
+                        padding: '10px 12px', borderRadius: 8,
+                        border: isSelected ? '2px solid #2563eb' : booked ? '1px solid #e5e7eb' : '1px solid #d1d5db',
+                        background: isSelected ? '#eff6ff' : booked ? '#f9fafb' : '#fff',
+                        cursor: booked ? 'not-allowed' : 'pointer',
+                        textAlign: 'center', transition: 'all .1s',
+                        fontWeight: isSelected ? 600 : 400,
+                        opacity: booked ? 0.5 : 1,
+                      }}>
+                      <div style={{ fontSize: 17, fontWeight: 700, color: isSelected ? '#1d4ed8' : booked ? '#9ca3af' : '#1e293b' }}>
+                        {slot.label}
+                      </div>
+                      <div style={{ fontSize: 11, color: booked ? '#9ca3af' : '#64748b', marginTop: 2 }}>
+                        {booked ? 'Ocupado' : `a ${slot.endLabel}`}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 8 }}>
+                Tarde
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
+                {TIME_SLOTS.filter(s => s.hour >= 12).map(slot => {
+                  const startVal = `${dateOnlyValue || new Date().toISOString().slice(0,10)}T${String(slot.hour).padStart(2,'0')}:${String(slot.minute).padStart(2,'0')}`
+                  const isSelected = form.start_at === startVal
+                  const booked = isSlotBooked(slot.hour, slot.minute)
+                  return (
+                    <button key={startVal} type="button"
+                      disabled={booked}
+                      onClick={() => setTimeSlot(slot.hour, slot.minute)}
+                      style={{
+                        padding: '10px 12px', borderRadius: 8,
+                        border: isSelected ? '2px solid #2563eb' : booked ? '1px solid #e5e7eb' : '1px solid #d1d5db',
+                        background: isSelected ? '#eff6ff' : booked ? '#f9fafb' : '#fff',
+                        cursor: booked ? 'not-allowed' : 'pointer',
+                        textAlign: 'center', transition: 'all .1s',
+                        fontWeight: isSelected ? 600 : 400,
+                        opacity: booked ? 0.5 : 1,
+                      }}>
+                      <div style={{ fontSize: 17, fontWeight: 700, color: isSelected ? '#1d4ed8' : booked ? '#9ca3af' : '#1e293b' }}>
+                        {slot.label}
+                      </div>
+                      <div style={{ fontSize: 11, color: booked ? '#9ca3af' : '#64748b', marginTop: 2 }}>
+                        {booked ? 'Ocupado' : `a ${slot.endLabel}`}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+
+            {/* Hidden datetime fields kept for form validation/submission */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
               <div>
-                <label style={{ ...labelStyle, marginBottom: 4 }}>Fecha y hora de inicio <span style={{ color: '#ef4444' }}>*</span></label>
+                <label style={{ ...labelStyle, marginBottom: 4 }}>Inicio <span style={{ color: '#ef4444' }}>*</span></label>
                 <input id="start-at" type="datetime-local" value={form.start_at}
                   onChange={e => setForm({ ...form, start_at: e.target.value })}
                   style={inputStyle(errors.start_at)} />
                 {errors.start_at && <span style={errStyle}>{errors.start_at}</span>}
               </div>
               <div>
-                <label style={{ ...labelStyle, marginBottom: 4 }}>Fecha y hora de fin <span style={{ color: '#ef4444' }}>*</span></label>
+                <label style={{ ...labelStyle, marginBottom: 4 }}>Fin <span style={{ color: '#ef4444' }}>*</span></label>
                 <input id="end-at" type="datetime-local" value={form.end_at}
                   onChange={e => setForm({ ...form, end_at: e.target.value })}
                   style={inputStyle(errors.end_at)} />

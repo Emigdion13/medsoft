@@ -24,6 +24,7 @@ from .serializers import (
     DoctorSerializer,
     PatientSerializer,
     AppointmentSerializer,
+    SecretaryDoctorSerializer,
 )
 from .token_utils import get_tokens_for_user
 
@@ -171,12 +172,17 @@ class UserViewSet(viewsets.ModelViewSet):
 
 # ── Specialty ViewSet ─────────────────────────────────────────────────
 
+class SpecialtyPagination(PageNumberPagination):
+    page_size = 100
+
+
 class SpecialtyViewSet(viewsets.ModelViewSet):
     """CRUD operations for medical specialties."""
 
     queryset = Specialty.objects.filter(is_active=True)
     serializer_class = SpecialtySerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = SpecialtyPagination
 
 
 # ── Doctor ViewSet ────────────────────────────────────────────────────
@@ -282,19 +288,35 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     pagination_class = AppointmentPagination
 
     def get_queryset(self) -> Any:
-        """Filter by organization and optionally by date."""
+        """Filter by organization, role-based visibility, and date."""
         qs = super().get_queryset()
 
         user = self.request.user
         if hasattr(user, 'organization') and user.organization:
             org = user.organization
-            # Filter appointments belonging to the user's organization
-            # (appointment itself, or via doctor/patient)
             qs = qs.filter(
                 Q(organization=org) |
                 Q(doctor__organization=org) |
                 Q(patient__organization=org)
             )
+
+        # ── Role-based visibility ──
+        role = getattr(user, 'role', '')
+        if role == 'DOCTOR':
+            # Doctors see only their own appointments
+            from apps.doctors.models import Doctor
+            try:
+                doctor = Doctor.objects.get(user=user, is_active=True)
+                qs = qs.filter(doctor=doctor)
+            except Doctor.DoesNotExist:
+                return qs.none()
+        elif role == 'SECRETARY':
+            # Secretaries see appointments of their assigned doctors
+            from apps.doctors.models import SecretaryDoctor
+            doctor_ids = SecretaryDoctor.objects.filter(
+                secretary=user, is_active=True
+            ).values_list('doctor_id', flat=True)
+            qs = qs.filter(doctor_id__in=doctor_ids)
 
         # Filter by date range if provided
         date_param = self.request.query_params.get('date')
@@ -309,3 +331,26 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer: AppointmentSerializer) -> None:
         """Let the serializer handle organization and created_by assignment."""
         serializer.save()
+
+
+# ── Secretary-Doctor Assignment ViewSet ───────────────────────────────
+
+class SecretaryDoctorPagination(PageNumberPagination):
+    page_size = 100
+
+
+class SecretaryDoctorViewSet(viewsets.ModelViewSet):
+    """Manage secretary-doctor assignments."""
+
+    from apps.doctors.models import SecretaryDoctor
+    queryset = SecretaryDoctor.objects.filter(is_active=True).select_related('secretary', 'doctor')
+    serializer_class = SecretaryDoctorSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = SecretaryDoctorPagination
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        secretary_id = self.request.query_params.get('secretary_id')
+        if secretary_id:
+            qs = qs.filter(secretary_id=secretary_id)
+        return qs

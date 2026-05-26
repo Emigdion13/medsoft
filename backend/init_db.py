@@ -106,6 +106,56 @@ def init():
     )
     print(f"Doctor {'created' if created else 'exists'}: {doctor.first_name} {doctor.last_name}")
 
+    # ── Doctor User (separate login for the doctor) ───────────────
+    doctor_user, created = User.objects.get_or_create(
+        username="doctor",
+        defaults={
+            "organization": org,
+            "email": "carlos.mendez@medisoft.local",
+            "first_name": "Carlos",
+            "last_name": "Mendez",
+            "role": "DOCTOR",
+            "is_active": True,
+        },
+    )
+    if not doctor_user.check_password("doctor123"):
+        doctor_user.set_password("doctor123")
+    doctor_user.role = "DOCTOR"
+    doctor_user.is_active = True
+    doctor_user.save()
+    # Link doctor to doctor_user
+    doctor.user = doctor_user
+    doctor.save(update_fields=['user'])
+    print(f"Doctor user {'created' if created else 'updated'}: {doctor_user.username} (pw: doctor123)")
+
+    # ── Secretary User ────────────────────────────────────────────
+    secretary_user, created = User.objects.get_or_create(
+        username="secretary",
+        defaults={
+            "organization": org,
+            "email": "secretary@medisoft.local",
+            "first_name": "Maria",
+            "last_name": "Lopez",
+            "role": "SECRETARY",
+            "is_active": True,
+        },
+    )
+    if not secretary_user.check_password("secretary123"):
+        secretary_user.set_password("secretary123")
+    secretary_user.role = "SECRETARY"
+    secretary_user.is_active = True
+    secretary_user.save()
+    print(f"Secretary user {'created' if created else 'updated'}: {secretary_user.username} (pw: secretary123)")
+
+    # ── Assign secretary to doctor ────────────────────────────────
+    from apps.doctors.models import SecretaryDoctor
+    sd, created = SecretaryDoctor.objects.get_or_create(
+        secretary=secretary_user,
+        doctor=doctor,
+        defaults={"is_active": True},
+    )
+    print(f"Secretary-Doctor assignment {'created' if created else 'exists'}: {sd}")
+
     # ── Patients ───────────────────────────────────────────────────
     patient_data = [
         {

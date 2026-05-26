@@ -115,3 +115,41 @@ class DoctorSpecialty(models.Model):
 
     def __str__(self):
         return f'{self.doctor} — {self.specialty}'
+
+
+class SecretaryDoctor(models.Model):
+    """Relación N:M secretaria/o → doctores asignados.
+    Una secretaria puede estar asignada a uno o varios doctores.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    secretary = models.ForeignKey(
+        'core_users.User',
+        on_delete=models.CASCADE,
+        db_column='secretary_id',
+        related_name='assigned_doctors',
+    )
+    doctor = models.ForeignKey(
+        'doctors.Doctor',
+        on_delete=models.CASCADE,
+        db_column='doctor_id',
+        related_name='assigned_secretaries',
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['secretary', 'doctor'],
+                name='secretary_doctor_unique',
+            ),
+        ]
+        indexes = [
+            models.Index(fields=['secretary'], name='sd_secretary_idx'),
+            models.Index(fields=['doctor'], name='sd_doctor_idx'),
+        ]
+
+    def __str__(self):
+        return f'{self.secretary.username} → Dr. {self.doctor.last_name}'

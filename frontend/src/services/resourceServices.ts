@@ -14,6 +14,18 @@ export const specialtiesService = {
   list(params?: { search?: string; page?: number }) {
     return api.get<PaginatedResponse<Specialty>>('/specialties/', { params })
   },
+
+  create(payload: { code: string; name: string; description?: string }) {
+    return api.post<Specialty>('/specialties/', payload)
+  },
+
+  update(id: string, payload: Partial<Specialty>) {
+    return api.patch<Specialty>(`/specialties/${id}/`, payload)
+  },
+
+  delete(id: string) {
+    return api.delete(`/specialties/${id}/`)
+  },
 }
 
 // ── Doctor ────────────────────────────────────────────────────────────
@@ -29,6 +41,10 @@ export const doctorsService = {
 
   update(id: string, payload: Partial<Doctor>) {
     return api.patch<Doctor>(`/doctors/${id}/`, payload)
+  },
+
+  delete(id: string) {
+    return api.delete(`/doctors/${id}/`)
   },
 }
 

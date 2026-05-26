@@ -39,3 +39,32 @@ export const usersService = {
     return api.patch<UserListItem>(`/users/${id}/`, payload)
   },
 }
+
+export interface SecretaryDoctorAssignment {
+  id: string
+  secretary_id?: string
+  doctor_id?: string
+  doctor_name: string
+  is_active: boolean
+  created_at: string
+}
+
+export const secretaryDoctorService = {
+  list(secretaryId: string) {
+    console.log('[secretaryDoctorService] list called with:', secretaryId)
+    return api.get<PaginatedResponse<SecretaryDoctorAssignment>>('/secretary-doctors/', {
+      params: { secretary_id: secretaryId },
+    }).then(r => { console.log('[secretaryDoctorService] result:', r); return r })
+  },
+
+  create(secretaryId: string, doctorId: string) {
+    return api.post<SecretaryDoctorAssignment>('/secretary-doctors/', {
+      secretary_id: secretaryId,
+      doctor_id: doctorId,
+    })
+  },
+
+  delete(id: string) {
+    return api.delete(`/secretary-doctors/${id}/`)
+  },
+}

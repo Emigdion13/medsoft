@@ -42,6 +42,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
+            'phone',
             'role',
             'organization',
             'is_active',
@@ -322,3 +323,34 @@ class AppointmentSerializer(serializers.ModelSerializer):
         # Run model-level clean() for additional validation (overlap check)
         instance.full_clean()
         return instance
+
+
+# ── Secretary-Doctor Assignment ───────────────────────────────────────
+
+class SecretaryDoctorSerializer(serializers.ModelSerializer):
+    """Serializer for SecretaryDoctor assignments."""
+
+    id = serializers.UUIDField(source='pk', read_only=True)
+    secretary_id = serializers.UUIDField(write_only=True)
+    doctor_id = serializers.UUIDField(write_only=True)
+    doctor_name = serializers.SerializerMethodField()
+
+    class Meta:
+        from apps.doctors.models import SecretaryDoctor
+        model = SecretaryDoctor
+        fields = ['id', 'secretary_id', 'doctor_id', 'doctor_name', 'is_active', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+    def get_doctor_name(self, obj):
+        return f'{obj.doctor.first_name} {obj.doctor.last_name}'
+
+    def create(self, validated_data):
+        secretary_id = validated_data.pop('secretary_id')
+        doctor_id = validated_data.pop('doctor_id')
+        from apps.core.users.models import User
+        from apps.doctors.models import Doctor, SecretaryDoctor
+        secretary = User.objects.get(pk=secretary_id)
+        doctor = Doctor.objects.get(pk=doctor_id)
+        return SecretaryDoctor.objects.create(
+            secretary=secretary, doctor=doctor, **validated_data
+        )

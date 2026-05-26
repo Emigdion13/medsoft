@@ -11,6 +11,7 @@ from .views import (
     DoctorViewSet,
     PatientViewSet,
     AppointmentViewSet,
+    SecretaryDoctorViewSet,
 )
 
 router = DefaultRouter()
@@ -19,6 +20,7 @@ router.register(r'specialties', SpecialtyViewSet, basename='specialty')
 router.register(r'doctors', DoctorViewSet, basename='doctor')
 router.register(r'patients', PatientViewSet, basename='patient')
 router.register(r'appointments', AppointmentViewSet, basename='appointment')
+router.register(r'secretary-doctors', SecretaryDoctorViewSet, basename='secretary-doctor')
 
 urlpatterns = [
     path('auth/login/', login_view, name='login'),
