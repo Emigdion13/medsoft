@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PageContainer } from '../components/common/SharedComponents'
 import { api } from '../utils/api'
 
@@ -39,6 +40,7 @@ const ENCOUNTER_STATUS: Record<string, { label: string; color: string; bg: strin
 }
 
 export default function MedicalRecords() {
+  const navigate = useNavigate()
   const [encounters, setEncounters] = useState<Encounter[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -108,7 +110,9 @@ export default function MedicalRecords() {
               {encounters.map(e => {
                 const st = ENCOUNTER_STATUS[e.status] || { label: e.status, color: '#6b7280', bg: '#f3f4f6' }
                 return (
-                  <tr key={e.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <tr key={e.id} onClick={() => e.patient?.id && navigate(`/pacientes/${e.patient.id}/historial`)}
+                    style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }}
+                    title="Ver historial del paciente">
                     <td style={{ padding: '12px 16px', fontWeight: 500 }}>
                       {e.patient?.first_name} {e.patient?.last_name}
                       <br /><span style={{ fontSize: 12, color: '#9ca3af' }}>{e.patient?.cedula}</span>

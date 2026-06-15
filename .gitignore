@@ -1,5 +1,5 @@
 # Environment files - DO NOT COMMIT secrets!
-.env
+.env*
 .venv
 
 # Qwen Code settings
@@ -11,6 +11,7 @@ __pycache__/
 *.pyc
 *.log
 db.sqlite3
+.DS_Store
 
 # Frontend
 node_modules/

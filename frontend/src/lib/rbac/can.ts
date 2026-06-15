@@ -9,7 +9,9 @@ export function can(user: User | null, action: ActionKey, module: ModuleKey, con
   if (!hasRolePermission(user.role, module, action)) return false
 
   if (module === 'appointments' || module === 'patients' || module === 'medical_records') {
-    if (action === 'view' || action === 'edit') {
+    // Viewing is allowed for any role holding the permission (checked above);
+    // ownership/assignment is only enforced for editing.
+    if (action === 'edit') {
       if (context?.isOwner === true || context?.isAssigned === true) return true
       if (user.role === 'SECRETARY' || user.role === 'RECEPTIONIST') return true
       return false

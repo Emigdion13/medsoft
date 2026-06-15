@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PageContainer } from '../components/common/SharedComponents'
 import { patientsService } from '../services/resourceServices'
 import type { Patient } from '../types'
@@ -31,6 +32,7 @@ const sColor = (s: string) => ({ ACTIVO: '#10b981', INACTIVO: '#6b7280', FALLECI
 const sLabel = (s: string) => ({ ACTIVO: 'Activo', INACTIVO: 'Inactivo', FALLECIDO: 'Fallecido' }[s] || s)
 
 export default function Patients() {
+  const navigate = useNavigate()
   const [patients, setPatients] = useState<Patient[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -239,6 +241,7 @@ export default function Patients() {
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <div style={{ display: 'flex', gap: 6 }}>
+                      <Btn color="#10b981" onClick={() => navigate(`/pacientes/${p.id}/historial`)}>Ver Historial</Btn>
                       <Btn color="#3b82f6" onClick={() => edit(p)}>Editar</Btn>
                       <Btn color="#ef4444" onClick={() => del(p.id)}>Eliminar</Btn>
                     </div>

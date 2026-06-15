@@ -83,11 +83,16 @@ class EncounterViewSet(viewsets.ModelViewSet):
         if doctor_id:
             qs = qs.filter(doctor_id=doctor_id)
 
+        # Filter by patient
+        patient_id = params.get('patient_id')
+        if patient_id:
+            qs = qs.filter(patient_id=patient_id)
+
         return qs.distinct()
 
     def perform_create(self, serializer: EncounterSerializer) -> None:
-        """Let serializer handle created_by/updated_by from request user."""
-        serializer.save()
+        """Set organization from request user; serializer handles created_by/updated_by."""
+        serializer.save(organization=self.request.user.organization)
 
 
 class VitalSignViewSet(viewsets.ModelViewSet):

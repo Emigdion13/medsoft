@@ -55,6 +55,10 @@ export const patientsService = {
     return api.get<PaginatedResponse<Patient>>('/patients/', { params })
   },
 
+  get(id: string) {
+    return api.get<Patient>(`/patients/${id}/`)
+  },
+
   create(payload: Partial<Patient>) {
     return api.post<Patient>('/patients/', payload)
   },

@@ -7,6 +7,7 @@ import Register from './pages/Register'
 import Appointments from './pages/Appointments'
 import Patients from './pages/Patients'
 import MedicalRecords from './pages/MedicalRecords'
+import PatientHistory from './pages/PatientHistory'
 import AdminUsersPage from './pages/admin/UsersPage'
 import SpecialtiesPage from './pages/admin/SpecialtiesPage'
 import { CanAccessRoute } from './lib/rbac/guards'
@@ -72,6 +73,17 @@ export default function App() {
           <ProtectedLayout>
             <CanAccessRoute module="medical_records">
               <MedicalRecords />
+            </CanAccessRoute>
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/pacientes/:patientId/historial"
+        element={
+          <ProtectedLayout>
+            <CanAccessRoute module="medical_records">
+              <PatientHistory />
             </CanAccessRoute>
           </ProtectedLayout>
         }

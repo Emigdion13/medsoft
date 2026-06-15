@@ -170,3 +170,112 @@ export interface CreateAppointmentPayload {
   reason: string
   notes?: string
 }
+
+// ── Clinical / Medical history ────────────────────────────────────────
+
+export type EncounterType = 'AMBULATORIO' | 'INTERNAMIENTO' | 'EMERGENCIA' | 'TELECONSULTA'
+export type EncounterStatus = 'ABIERTO' | 'CERRADO' | 'CANCELADO'
+export type NoteType = 'EVOLUCION' | 'HISTORIA' | 'NOTA_ENFERMERIA' | 'NOTA_MEDICA'
+export type NoteStatus = 'BORRADOR' | 'FIRMADA' | 'ANULADA'
+export type DiagnosisType = 'PRINCIPAL' | 'SECUNDARIO' | 'COMORBILIDAD'
+export type DiagnosisStatus = 'ACTIVO' | 'RESUELTO' | 'CANCELADO'
+export type PrescriptionRoute =
+  | 'ORAL' | 'IV' | 'IM' | 'TOPICA' | 'INHALADA' | 'NASAL' | 'OTICO' | 'OCULAR'
+export type PrescriptionStatus = 'ACTIVA' | 'SUSPENDIDA' | 'COMPLETADA' | 'CANCELADA'
+
+interface PatientLookup { id: string; first_name: string; last_name: string; cedula: string }
+interface DoctorLookup { id: string; first_name: string; last_name: string; cedula: string }
+interface AppointmentLookup { id: string; start_at: string; end_at: string | null; reason: string }
+
+export interface Encounter {
+  id: string
+  patient: PatientLookup
+  doctor: DoctorLookup
+  appointment: AppointmentLookup | null
+  encounter_type: EncounterType
+  status: EncounterStatus
+  start_at: string
+  end_at: string | null
+  chief_complaint: string | null
+  room_number: string | null
+  bed_number: string | null
+  admission_source: string | null
+  discharge_reason: string | null
+  created_by_name: string | null
+  updated_by_name: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateEncounterPayload {
+  patient_id: string
+  doctor_id: string
+  appointment_id?: string | null
+  encounter_type: EncounterType
+  status?: EncounterStatus
+  start_at: string
+  end_at?: string | null
+  chief_complaint?: string | null
+}
+
+export interface VitalSign {
+  id: string
+  encounter: string
+  recorded_by_name: string | null
+  recorded_at: string
+  temperature_c: string | null
+  bp_systolic: number | null
+  bp_diastolic: number | null
+  heart_rate: number | null
+  respiratory_rate: number | null
+  oxygen_saturation: string | null
+  weight_kg: string | null
+  height_cm: string | null
+  bmi: string | null
+  glucose_mg_dl: string | null
+  notes: string | null
+}
+
+export interface ClinicalNote {
+  id: string
+  encounter: string
+  doctor: string
+  note_type: NoteType
+  content: string
+  status: NoteStatus
+  signed_by: string | null
+  signed_by_name: string | null
+  signed_at: string | null
+  content_hash: string | null
+  created_by_name: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Diagnosis {
+  id: string
+  encounter: string
+  icd10_code: string
+  description: string
+  diagnosis_type: DiagnosisType
+  is_primary: boolean
+  status: DiagnosisStatus
+  recorded_by_name: string | null
+  recorded_at: string
+}
+
+export interface Prescription {
+  id: string
+  encounter: string
+  medication_name: string
+  medication_code: string | null
+  dose: string
+  frequency: string
+  route: PrescriptionRoute
+  duration_days: number | null
+  quantity: number | null
+  instructions: string | null
+  status: PrescriptionStatus
+  prescribed_by_name: string | null
+  prescribed_at: string
+}
