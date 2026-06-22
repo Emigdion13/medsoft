@@ -2,8 +2,9 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../utils/auth'
 import { can } from '../../lib/rbac/can'
+import type { ModuleKey } from '../../types'
 
-type NavItem = { to: string; label: string; icon: string; module: string }
+type NavItem = { to: string; label: string; icon: string; module: ModuleKey }
 
 const ROLE_LABELS: Record<string, string> = {
   ADMINISTRATOR: 'Administrador',

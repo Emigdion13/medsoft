@@ -41,10 +41,10 @@ export default function Dashboard() {
   }, [])
 
   const statCards = [
-    { label: 'Total Pacientes', value: stats.total_patients, icon: '👥' },
+    { label: 'Total Pacientes', value: stats.total_patients, icon: '👥', to: '/pacientes' },
     { label: 'Nuevos Este Mes', value: stats.new_this_month, icon: '🆕' },
     { label: 'Citas Hoy', value: stats.today_appointments, icon: '📅' },
-    { label: 'Historias Médicas', value: stats.active_records, icon: '📋' },
+    { label: 'Historias Médicas', value: stats.active_records, icon: '📋', to: '/historial-medico' },
   ]
 
   return (
@@ -110,8 +110,8 @@ export default function Dashboard() {
         gap: 16,
         marginBottom: 28,
       }}>
-        {statCards.map((card, i) => (
-          <div key={card.label} className="animate-fade" style={{
+        {statCards.map((card, i) => {
+          const cardStyle: React.CSSProperties = {
             background: '#fff',
             borderRadius: 14,
             padding: '20px 24px',
@@ -121,25 +121,40 @@ export default function Dashboard() {
             alignItems: 'center',
             gap: 16,
             animationDelay: `${i * .1}s`,
-          }}>
-            <div style={{
-              width: 48, height: 48, borderRadius: 12,
-              background: cardColors[i].bg,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22,
-            }}>
-              {card.icon}
-            </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--gray-900)', lineHeight: 1 }}>
-                {card.value.toLocaleString()}
+            textDecoration: 'none',
+            color: 'inherit',
+            cursor: card.to ? 'pointer' : 'default',
+          }
+          const inner = (
+            <>
+              <div style={{
+                width: 48, height: 48, borderRadius: 12,
+                background: cardColors[i].bg,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 22,
+              }}>
+                {card.icon}
               </div>
-              <div style={{ fontSize: 13, color: 'var(--gray-500)', marginTop: 4 }}>
-                {card.label}
+              <div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--gray-900)', lineHeight: 1 }}>
+                  {card.value.toLocaleString()}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--gray-500)', marginTop: 4 }}>
+                  {card.label}
+                </div>
               </div>
+            </>
+          )
+          return card.to ? (
+            <Link key={card.label} to={card.to} className="animate-fade" style={cardStyle}>
+              {inner}
+            </Link>
+          ) : (
+            <div key={card.label} className="animate-fade" style={cardStyle}>
+              {inner}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Quick Actions */}

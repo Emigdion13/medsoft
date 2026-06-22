@@ -1,8 +1,12 @@
+import hashlib
 from typing import Any
 
-from rest_framework import viewsets
+from django.utils import timezone
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .models import ClinicalNote, Diagnosis, Prescription
@@ -66,6 +70,35 @@ class ClinicalNoteViewSet(viewsets.ModelViewSet):
         request = self.request
         if hasattr(request, 'user'):
             serializer.save(created_by=request.user)
+
+    @action(detail=True, methods=['post'])
+    def sign(self, request: Request, pk: str | None = None) -> Response:
+        """Sign a clinical note: mark FIRMADA with signer, timestamp and content hash."""
+        note = self.get_object()
+
+        if note.status == 'FIRMADA':
+            return Response(
+                {'detail': 'La nota ya está firmada.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if note.status == 'ANULADA':
+            return Response(
+                {'detail': 'No se puede firmar una nota anulada.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        note.status = 'FIRMADA'
+        note.signed_by = request.user
+        note.signed_at = timezone.now()
+        note.content_hash = hashlib.sha256(note.content.encode('utf-8')).hexdigest()
+        note.updated_by = request.user
+        note.save(update_fields=[
+            'status', 'signed_by', 'signed_at', 'content_hash',
+            'updated_by', 'updated_at',
+        ])
+
+        serializer = self.get_serializer(note)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class DiagnosisViewSet(viewsets.ModelViewSet):
